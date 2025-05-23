@@ -19,13 +19,13 @@ var (
 	initOnce         sync.Once
 )
 
-func InitFirebase(){
+func InitFirebase(keyPath *string){
 	initOnce.Do(func(){
 		ctx := context.Background()
 		var err error
 		
 		//Load the env file
-		err = godotenv.Load("keys/.env") 
+		err = godotenv.Load(*keyPath) 
 		if err != nil {
 			log.Fatalf("Unable to load the env file %v", err)
 		} 
