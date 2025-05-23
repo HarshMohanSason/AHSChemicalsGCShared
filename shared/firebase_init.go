@@ -4,6 +4,7 @@ import (
 	"context"
 	"log"
 	"os"
+	"fmt"
 	"sync"
 	"github.com/joho/godotenv"
 	"cloud.google.com/go/firestore"
@@ -19,7 +20,7 @@ var (
 	initOnce         sync.Once
 )
 
-func InitFirebase(keyPath *string){
+func InitFirebaseAdminSDK(sdkType string, keyPath *string){
 	initOnce.Do(func(){
 		ctx := context.Background()
 		var err error
@@ -29,10 +30,10 @@ func InitFirebase(keyPath *string){
 		if err != nil {
 			log.Fatalf("Unable to load the env file %v", err)
 		} 
-		
-		//Get the firebase credentials
-		cred := os.Getenv("FIREBASE_CREDENTIALS") 
-		
+		//prepare the credential
+		formatCred := fmt.Sprintf("FIREBASE_CREDENTIALS_%s", sdkType)
+		cred := os.Getenv(formatCred)
+
 		//Make sure credentials fetched are valid
 		if cred != "" {
 			opt := option.WithCredentialsFile(cred)
@@ -46,7 +47,7 @@ func InitFirebase(keyPath *string){
 			log.Fatal("Credentials path is empty.")
 		}
 
-		//Once thbe app is initialized, initialize the AppClient
+		//Once the app is initialized, initialize the AppClient
 		AuthClient, err = App.Auth(ctx)
 		if err != nil {
 			log.Fatalf("Failed to initialize Auth client: %v", err)
