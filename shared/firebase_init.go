@@ -36,7 +36,7 @@ func InitFirebaseDebug(keyPath *string){
 		}
 		
 		//Initialize the Firebase App
-		App, err := firebase.NewApp(ctx, conf, opt)
+		App, err = firebase.NewApp(ctx, conf, opt)
 		if err != nil {
 		    log.Fatalf("Error initializing firebase: %v", err)
 		}
@@ -77,7 +77,7 @@ func InitFirebaseProd(keyPath *string){
 		}
 		
 		//Initialize the Firebase App
-		App, err := firebase.NewApp(ctx, conf, opt)
+		App, err = firebase.NewApp(ctx, conf, opt)
 		if err != nil {
 		    log.Fatalf("Error initializing firebase: %v", err)
 		}
