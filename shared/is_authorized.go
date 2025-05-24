@@ -2,6 +2,7 @@ package shared
 
 import (
 	"errors"
+	"log"
 	"net/http"
 	"strings"
 )
@@ -22,9 +23,10 @@ func IsAuthorized(request *http.Request) error {
 		idToken := parts[1]
 		token, err := AuthClient.VerifyIDToken(ctx, idToken)
 		if err != nil {
+			log.Printf("Error occurred: %v", err)
 			return err
 		}
-		
+
 		//Check if the user is admin or not
 		if !token.Claims["admin"].(bool){
 			return errors.New("Unauthroized. Only admins are allowed to perform this operation")
