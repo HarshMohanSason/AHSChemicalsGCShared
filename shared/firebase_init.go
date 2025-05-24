@@ -20,7 +20,7 @@ var (
 	initOnce         sync.Once
 )
 
-func InitFirebaseDebug(keyPath *string){
+func InitFirebaseDebug(keyPath string){
 	initOnce.Do(func(){
 		ctx := context.Background()
 		var err error
@@ -30,16 +30,8 @@ func InitFirebaseDebug(keyPath *string){
 			DatabaseURL: "https://ahschemicalsdebug-default-rtdb.firebaseio.com/",
 		}
 
-		var opt option.ClientOption
-		if keyPath != nil {
-		    opt = option.WithCredentialsFile(*keyPath)
-		}
-		
-		//Initialize the Firebase App
+		opt := option.WithCredentialsFile(keyPath)
 		App, err = firebase.NewApp(ctx, conf, opt)
-		if err != nil {
-		    log.Fatalf("Error initializing firebase: %v", err)
-		}
 
 		//Initialize the Auth Client
 		AuthClient, err = App.Auth(ctx)
@@ -71,16 +63,21 @@ func InitFirebaseProd(keyPath *string){
 			DatabaseURL: "https://ahschemicalsprod-default-rtdb.firebaseio.com",
 		}
 
-		var opt option.ClientOption
+		//Initialize the Firebase App
+		var app *firebase.App
 		if keyPath != nil {
-		    opt = option.WithCredentialsFile(*keyPath)
+			opt := option.WithCredentialsFile(*keyPath)
+			app, err = firebase.NewApp(ctx, conf, opt)
+		} else {
+			// Use default credentials
+			app, err = firebase.NewApp(ctx, conf)
 		}
 		
-		//Initialize the Firebase App
-		App, err = firebase.NewApp(ctx, conf, opt)
 		if err != nil {
-		    log.Fatalf("Error initializing firebase: %v", err)
+			log.Fatalf("Error initializing firebase: %v", err)
 		}
+
+		App = app
 
 		//Initialize the Auth Client
 		AuthClient, err = App.Auth(ctx)

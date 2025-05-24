@@ -16,7 +16,7 @@ func TestMain(m *testing.M){
 	debugPath := os.Getenv("FIREBASE_ADMIN_SDK_DEBUG")
 	
 	//Initialize the debug project
-	shared.InitFirebaseDebug(&debugPath)
+	shared.InitFirebaseDebug(debugPath)
 	
 	//Run 
 	exitCode := m.Run()
