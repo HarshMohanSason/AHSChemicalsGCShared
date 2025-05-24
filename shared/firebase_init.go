@@ -29,12 +29,16 @@ func InitFirebaseDebug(keyPath *string){
 		conf := &firebase.Config{
 			DatabaseURL: "https://ahschemicalsdebug-default-rtdb.firebaseio.com/",
 		}
-		opt := option.WithCredentialsFile(*keyPath)
-			
-		//Initialize the firebase app
-		App, err = firebase.NewApp(ctx, conf, opt)
-		if err != nil{
-				log.Fatalf("Unable to register the app: %v", err)
+
+		var opt option.ClientOption
+		if keyPath != nil {
+		    opt = option.WithCredentialsFile(*keyPath)
+		}
+		
+		//Initialize the Firebase App
+		App, err := firebase.NewApp(ctx, conf, opt)
+		if err != nil {
+		    log.Fatalf("Error initializing firebase: %v", err)
 		}
 
 		//Initialize the Auth Client
@@ -66,12 +70,16 @@ func InitFirebaseProd(keyPath *string){
 		conf := &firebase.Config{
 			DatabaseURL: "https://ahschemicalsprod-default-rtdb.firebaseio.com",
 		}
-		opt := option.WithCredentialsFile(*keyPath)
+
+		var opt option.ClientOption
+		if keyPath != nil {
+		    opt = option.WithCredentialsFile(*keyPath)
+		}
 		
 		//Initialize the Firebase App
 		App, err := firebase.NewApp(ctx, conf, opt)
-		if err != nil{
-			log.Fatalf("Error initializing firebase: %v", err)
+		if err != nil {
+		    log.Fatalf("Error initializing firebase: %v", err)
 		}
 
 		//Initialize the Auth Client
