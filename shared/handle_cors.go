@@ -4,16 +4,7 @@ import (
 	"net/http"
 )
 
-func CORSHandler(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(response http.ResponseWriter, request *http.Request) {
-		
-		corsEnabledFunction(response, request)
-		
-		next.ServeHTTP(response, request)
-	})
-}
-
-func corsEnabledFunction(response http.ResponseWriter, request *http.Request) {
+func CorsEnabledFunction(response http.ResponseWriter, request *http.Request) {
 	
 	//Pre defined allowed origins
 	allowedOrigins := map[string]bool{
