@@ -57,6 +57,7 @@ func InitFirebaseDebug(keyPath string){
 			log.Fatalf("Failed to initialize Realtime db client: %v", err)
 		}
 
+		//Initialize the Storage Client
 		StorageClient, err = App.Storage(ctx)
 		if err != nil{
 			log.Fatalf("Failed to initialize Storage client: %v", err)
@@ -102,13 +103,13 @@ func InitFirebaseProd(keyPath *string){
 			log.Fatalf("Failed to initialize Firestore client: %v", err)
 		}
 
-		//Initialize the Realtime db Client
+		//Initialize the Realtime Cleint
 		RealtimeClient, err = App.Database(ctx)
 		if err != nil{
 			log.Fatalf("Failed to initialize realtime db: %v", err)
 		}
 
-		//Initialize the Firestore Storage Client
+		//Initialize the Storage Client
 		StorageClient, err = App.Storage(ctx)
 		if err != nil{
 			log.Fatalf("Failed to initialize Storage client: %v", err)
