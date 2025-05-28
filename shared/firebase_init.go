@@ -9,12 +9,14 @@ import (
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
 	"firebase.google.com/go/v4/db"
+	"firebase.google.com/go/v4/storage"
 	"google.golang.org/api/option"
 )
 
 var (
 	App              *firebase.App
 	AuthClient       *auth.Client
+	StorageClient	 *storage.Client
 	FirestoreClient  *firestore.Client
 	RealtimeClient   *db.Client
 	initOnce         sync.Once
@@ -53,6 +55,11 @@ func InitFirebaseDebug(keyPath string){
 		RealtimeClient, err = App.Database(ctx)
 		if err != nil{
 			log.Fatalf("Failed to initialize Realtime db client: %v", err)
+		}
+
+		StorageClient, err = App.Storage(ctx)
+		if err != nil{
+			log.Fatalf("Failed to initialize Storage client: %v", err)
 		}
 	})
 }
@@ -99,6 +106,12 @@ func InitFirebaseProd(keyPath *string){
 		RealtimeClient, err = App.Database(ctx)
 		if err != nil{
 			log.Fatalf("Failed to initialize realtime db: %v", err)
+		}
+
+		//Initialize the Firestore Storage Client
+		StorageClient, err = App.Storage(ctx)
+		if err != nil{
+			log.Fatalf("Failed to initialize Storage client: %v", err)
 		}
 	})
 }
