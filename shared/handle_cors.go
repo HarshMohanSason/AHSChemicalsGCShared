@@ -20,7 +20,7 @@ func CorsEnabledFunction(response http.ResponseWriter, request *http.Request) bo
 	//Set headers if origin exists 
 	if allowedOrigins[origin] {
 		response.Header().Set("Access-Control-Allow-Origin", origin)
-		response.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
+		response.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS")
 		response.Header().Set("Access-Control-Allow-Headers", "Content-Type, Authorization")
 		response.Header().Set("Access-Control-Allow-Credentials", "true")
 		response.Header().Set("Access-Control-Max-Age", "3600")
