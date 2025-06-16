@@ -1,17 +1,22 @@
 package tests
 
 import (
-	"github.com/joho/godotenv"
+	"log"
 	"os"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 	"testing"
-	)
+
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
+	"github.com/joho/godotenv"
+)
 
 func TestMain(m *testing.M){
 
 	//Load the env file
-	godotenv.Load("/Users/harshmohansason/Documents/AHSChemicalsGCShared/keys/.env")
-	
+	err := godotenv.Load("../keys/.env")
+	if err != nil{
+		log.Fatalf("Error occurred loading the env file %v", err)
+	}
+
 	//Load the admin sdk json from env
 	debugPath := os.Getenv("FIREBASE_ADMIN_SDK_DEBUG")
 	

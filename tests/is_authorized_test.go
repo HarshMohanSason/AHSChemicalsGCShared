@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
@@ -11,7 +12,7 @@ import (
 
 func TestIsAuthroized(t *testing.T){
 	
-	jwtToken := "enterthejwthere:)"
+	jwtToken := os.Getenv("TEMP_JWT_TOKEN")
 	bearer := fmt.Sprintf("Bearer %s", jwtToken)
 	
 	//Stimulate a new request 
