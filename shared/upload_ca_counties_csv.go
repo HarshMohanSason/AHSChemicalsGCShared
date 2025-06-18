@@ -54,7 +54,7 @@ func UploadCaCountyCsvToFirestore(){
 			}
 
 			countyObject := map[string]any{
-				"state":    "California",
+				"state":    "CALIFORNIA",
 				"county": 	row[3],
 				"city":   	row[4],
 				"rate":     rate,
