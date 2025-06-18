@@ -2,6 +2,7 @@ package shared
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -17,8 +18,10 @@ type FirebaseErrorResponse struct {
 	} `json:"error"`
 }
 
-func WriteJSONError(response http.ResponseWriter, statusCode int, message string){
+func WriteJSONError(response http.ResponseWriter, statusCode int, message string) {
 	response.Header().Set("Content-type", "application/json")
 	response.WriteHeader(statusCode)
-	_ = json.NewEncoder(response).Encode(map[string]any{"code": statusCode, "message": message})
+	if err := json.NewEncoder(response).Encode(map[string]any{"code": statusCode, "message": message}); err != nil {
+		log.Printf("Error writing the error response: %v", err)
+	}
 }

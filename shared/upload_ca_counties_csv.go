@@ -11,10 +11,10 @@ import (
 
 const maxConcurrentUploads = 100
 
-func UploadCaCountyCsvToFirestore(){
+func UploadCaCountyCsvToFirestore() {
 
 	file, err := os.Open("./extras/ca_county_details.csv")
-	if err != nil{
+	if err != nil {
 		log.Fatal("Error occurred reading the file, please try again")
 	}
 
@@ -30,13 +30,13 @@ func UploadCaCountyCsvToFirestore(){
 	}
 
 	log.Print("Uploading the county csv data to firestore...")
-	
+
 	var wg sync.WaitGroup
 	sem := make(chan struct{}, maxConcurrentUploads)
 
-	// Read through the list of records 
-	for i, row := range records{
-		if i == 0{
+	// Read through the list of records
+	for i, row := range records {
+		if i == 0 {
 			continue
 		}
 
@@ -49,15 +49,15 @@ func UploadCaCountyCsvToFirestore(){
 
 			//Convert the rate to float
 			rate, err := strconv.ParseFloat(row[6], 64)
-			if err != nil{
+			if err != nil {
 				log.Fatal("Error converting the rate to float")
 			}
 
 			countyObject := map[string]any{
-				"state":    "CALIFORNIA",
-				"county": 	row[3],
-				"city":   	row[4],
-				"rate":     rate,
+				"state":  "CALIFORNIA",
+				"county": row[3],
+				"city":   row[4],
+				"rate":   rate,
 			}
 			_, _, err = FirestoreClient.Collection("tax_rates").Add(context.Background(), countyObject)
 			if err != nil {
@@ -69,4 +69,4 @@ func UploadCaCountyCsvToFirestore(){
 	wg.Wait()
 	log.Print("Added all the county data to firestore.")
 
-}	
+}

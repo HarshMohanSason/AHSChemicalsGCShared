@@ -5,10 +5,10 @@ import (
 )
 
 func CorsEnabledFunction(response http.ResponseWriter, request *http.Request) bool {
-	
+
 	allowedOrigins := map[string]bool{
-		"http://localhost:3000": true, 
-		"https://ahschemicalsdebug.web.app": true,
+		"http://localhost:3000":              true,
+		"https://ahschemicalsdebug.web.app":  true,
 		"https://azurehospitalitysupply.com": true,
 	}
 
@@ -17,7 +17,7 @@ func CorsEnabledFunction(response http.ResponseWriter, request *http.Request) bo
 		origin = request.Header.Get("Origin")
 	}
 
-	//Set headers if origin exists 
+	//Set headers if origin exists
 	if allowedOrigins[origin] {
 		response.Header().Set("Access-Control-Allow-Origin", origin)
 		response.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS")
@@ -26,10 +26,10 @@ func CorsEnabledFunction(response http.ResponseWriter, request *http.Request) bo
 		response.Header().Set("Access-Control-Max-Age", "3600")
 	}
 
-	//Handle Pre flight request 
+	//Handle Pre flight request
 	if request.Method == http.MethodOptions {
 		response.WriteHeader(http.StatusNoContent)
-		return true 
+		return true
 	}
 
 	return false
