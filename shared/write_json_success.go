@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func WriteJSONSuccess(response http.ResponseWriter, statusCode int, message string, data map[string]any) {
+func WriteJSONSuccess(response http.ResponseWriter, statusCode int, message string, data any) {
 	response.Header().Set("Content-Type", "application/json")
 	response.WriteHeader(statusCode)
 
