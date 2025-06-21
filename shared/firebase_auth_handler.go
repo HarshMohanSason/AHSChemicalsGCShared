@@ -34,10 +34,7 @@ func IsAuthorized(request *http.Request) error {
 	// Extract the ID token from the Authorization header.
 	idToken := parts[1]
 	_, err := AuthClient.VerifyIDToken(ctx, idToken)
-	if err != nil {
-		return err
-	}
-	return nil
+	return err
 }
 
 // IsAuthorizedAndAdmin verifies if the incoming HTTP request is authenticated with a valid Firebase ID token
@@ -91,6 +88,5 @@ func IsAuthorizedAndAdmin(request *http.Request) error {
 	if !ok || !adminClaim {
 		return errors.New("unauthorized: only admins are allowed to perform this operation")
 	}
-
 	return nil
 }
