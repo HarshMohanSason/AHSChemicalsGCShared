@@ -3,7 +3,6 @@ package tests
 import (
 	"context"
 	"fmt"
-	"os"
 	"testing"
 
 	"cloud.google.com/go/compute/metadata"
@@ -18,7 +17,7 @@ func TestGetSecretFromGCP(t *testing.T){
 	}
 
 	secretPath := fmt.Sprintf("projects/%s/secrets/%s/versions/latest",projectID,"TWILIO_RECIPENTS_PHONE")
-	
+
 	_, err = shared.GetSecretFromGCP(secretPath)
 	if err != nil{
 		t.Fatalf("Error occurred while getting the secret %v", err)
