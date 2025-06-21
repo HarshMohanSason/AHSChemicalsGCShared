@@ -90,3 +90,53 @@ func IsAuthorizedAndAdmin(request *http.Request) error {
 	}
 	return nil
 }
+
+// GetUIDIfAuthorized verifies the Firebase ID token provided in the Authorization header
+// of an HTTP request and returns the associated user's UID if authentication succeeds.
+//
+// This function is typically used to associate incoming requests with authenticated Firebase users.
+//
+// Parameters:
+//   - request (*http.Request): The incoming HTTP request expected to contain the Authorization header.
+//
+// Expected Authorization header format:
+//   Authorization: Bearer <Firebase_ID_Token>
+//
+// Returns:
+//   - string: The Firebase user's UID if token verification is successful.
+//   - error:  If the Authorization header is malformed or token verification fails.
+//
+// Usage Example:
+//
+//	uid, err := shared.GetUIDIfAuthorized(request)
+//	if err != nil {
+//	    // Handle unauthorized request
+//	}
+//	fmt.Println("User UID:", uid)
+//
+// Errors:
+//   - Returns an error if:
+//     - The Authorization header is missing, malformed, or does not follow the Bearer token format.
+//     - Token verification fails via Firebase Admin SDK.
+//
+func GetUIDIfAuthorized(request *http.Request) (string, error){
+	ctx := request.Context()
+
+	// Extract and validate the Authorization header.
+	authHeader := request.Header.Get("Authorization")
+	parts := strings.SplitN(authHeader, " ", 2)
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return "", errors.New("invalid Authorization header format")
+	}
+
+	// Extract the ID token from the Authorization header.
+	idToken := parts[1]
+
+	//Verify the the token
+	token, err := AuthClient.VerifyIDToken(ctx, idToken)
+	if err != nil {
+		return "", err
+	}
+	//Return the uid 
+	return token.UID, nil
+}
