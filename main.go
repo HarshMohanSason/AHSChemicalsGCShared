@@ -15,7 +15,8 @@ func main(){
 	if err != nil{
 		log.Fatalf("Error occurred loading the env file %v", err)
 	}
-	//Load the admin sdk
+
+	//Load the firebase admin sdk's
 	if(os.Getenv("ENV") == "DEBUG"){
 		shared.InitFirebaseDebug(os.Getenv("FIREBASE_ADMIN_SDK_DEBUG"))
 		log.Print("Initialized firebase debug admin sdk")
@@ -24,8 +25,4 @@ func main(){
 		shared.InitFirebaseProd(&path)
 		log.Print("Initialized firebase prod admin sdk")
 	}
-
-	//Call any functions to test here locally
-
-	//shared.UploadPropertiesDetailsInBulkToFirestore()
 }
