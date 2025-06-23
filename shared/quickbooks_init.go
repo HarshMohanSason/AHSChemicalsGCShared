@@ -25,12 +25,10 @@ var (
 
 // InitQuickBooksDebug initializes QuickBooks credentials for the **debug** environment.
 //
-// It loads environment variables from a local .env file (expected at "../keys/.env")
+// It loads environment variables from a local .env file
 // and sets the global QuickBooks credential variables.
 //
-// This function is **intended for local development only** and uses `sync.Once` to ensure
-// initialization happens only once during the program lifecycle.
-//
+// This function is **intended for local development only**
 // Environment variables required in the .env file:
 //   QUICKBOOKS_DEBUG_CLIENT_ID
 //   QUICKBOOKS_DEBUG_CLIENT_SECRET
@@ -44,14 +42,12 @@ var (
 //
 //	shared.InitQuickBooksDebug()
 func InitQuickBooksDebug() {
-	initOnce.Do(func() {
-		QUICKBOOKS_CLIENT_ID = os.Getenv("QUICKBOOKS_DEBUG_CLIENT_ID")
-		QUICKBOOKS_CLIENT_SECRET = os.Getenv("QUICKBOOKS_DEBUG_CLIENT_SECRET")
-		QUICKBOOKS_AUTH_BEGIN_URL = os.Getenv("QUICKBOOKS_DEBUG_AUTH_BEGIN_URL")
-		QUICKBOOKS_AUTH_CALLBACK_URL = os.Getenv("QUICKBOOKS_DEBUG_AUTH_CALLBACK_URL")
-		
-		log.Println("Initialized quickbooks credentials in debug...")
-	})
+	QUICKBOOKS_CLIENT_ID = os.Getenv("QUICKBOOKS_DEBUG_CLIENT_ID")
+	QUICKBOOKS_CLIENT_SECRET = os.Getenv("QUICKBOOKS_DEBUG_CLIENT_SECRET")
+	QUICKBOOKS_AUTH_BEGIN_URL = os.Getenv("QUICKBOOKS_DEBUG_AUTH_BEGIN_URL")
+	QUICKBOOKS_AUTH_CALLBACK_URL = os.Getenv("QUICKBOOKS_DEBUG_AUTH_CALLBACK_URL")
+	
+	log.Println("Initialized quickbooks credentials in debug...")
 }
 
 // InitQuickBooksProd initializes QuickBooks credentials for the **production** environment.

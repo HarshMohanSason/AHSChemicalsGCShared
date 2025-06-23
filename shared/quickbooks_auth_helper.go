@@ -175,7 +175,6 @@ func RefreshToken(ctx context.Context, refreshToken string) (map[string]any, err
 //   - ctx: Context for request lifetime
 //   - tokenData: Token response data from QuickBooks (access_token, refresh_token, etc.)
 //   - authData: Metadata map including "uid" and "state"
-//   - firestoreClient: Firestore client instance
 //
 // Returns:
 //   - error: Non-nil if an error occurs during Firestore save operation
