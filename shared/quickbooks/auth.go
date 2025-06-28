@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 )
 
@@ -176,7 +177,7 @@ func RefreshToken(ctx context.Context, refreshToken string) (map[string]any, err
 // Parameters:
 //   - ctx: Context for request lifetime
 //   - tokenData: Token response data from QuickBooks (access_token, refresh_token, etc.)
-//   - authData: Metadata map including "uid" and "state"
+//   - authData: Metadata map including "uid", "state" and "realm_id"
 //
 // Returns:
 //   - error: Non-nil if an error occurs during Firestore save operation
@@ -202,7 +203,7 @@ func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authDat
 		"realm_id": 	 authData["realm_id"],
 	}
 
-	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData)
+	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData, firestore.MergeAll)
 	return err
 }
 
