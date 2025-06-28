@@ -1,14 +1,14 @@
-package shared
+package firebase_shared
 
 import (
 	"context"
 	"log"
-	"sync"
 
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
 	"firebase.google.com/go/v4/storage"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 	"google.golang.org/api/option"
 )
 
@@ -24,9 +24,6 @@ var (
 
 	// FirestoreClient provides access to Firestore database features.
 	FirestoreClient *firestore.Client
-
-	// initOnce ensures Firebase initialization occurs only once.
-	initOnce sync.Once
 )
 
 // InitFirebaseDebug initializes Firebase clients for the debug environment.
@@ -42,7 +39,7 @@ var (
 // Logs:
 //   - Calls log.Fatalf() and exits the application if initialization of any service fails.
 func InitFirebaseDebug(keyPath string) {
-	initOnce.Do(func() {
+	shared.InitFirebaseOnce.Do(func() {
 		ctx := context.Background()
 		var err error
 
@@ -85,7 +82,7 @@ func InitFirebaseDebug(keyPath string) {
 // Logs:
 //   - Calls log.Fatalf() and exits the application if initialization of any service fails.
 func InitFirebaseProd(keyPath *string) {
-	initOnce.Do(func() {
+	shared.InitFirebaseOnce.Do(func() {
 		ctx := context.Background()
 		var err error
 

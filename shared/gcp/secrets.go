@@ -1,32 +1,31 @@
-package shared
+package gcp
 
 import (
 	"context"
-	"sync"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 )
 
 var (
 	secretManagerClient *secretmanager.Client
-	secretManagerOnce   sync.Once
 	secretManagerErr    error
 )
 
 // getSecretManagerClient initializes the Secret Manager client once.
 func getSecretManagerClient(ctx context.Context) (*secretmanager.Client, error) {
-	secretManagerOnce.Do(func() {
+	shared.InitGCPOnce.Do(func() {
 		secretManagerClient, secretManagerErr = secretmanager.NewClient(ctx)
 	})
 	return secretManagerClient, secretManagerErr
 }
 
 // GetSecretFromGCP retrieves the latest version of a secret from Google Cloud Secret Manager.
-// 
+//
 // Parameters:
 //   - secretName: The fully-qualified name of the secret version in the format:
-//       "projects/{projectID}/secrets/{secretName}/versions/{version}"
+//     "projects/{projectID}/secrets/{secretName}/versions/{version}"
 //     For example: "projects/my-project/secrets/my-secret/versions/latest"
 //
 // Returns:

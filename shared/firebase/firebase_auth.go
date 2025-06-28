@@ -1,4 +1,4 @@
-package shared
+package firebase_shared
 
 import (
 	"errors"

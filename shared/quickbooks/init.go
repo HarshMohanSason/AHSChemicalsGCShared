@@ -1,4 +1,4 @@
-package shared
+package quickbooks
 
 import (
 	"context"
@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"cloud.google.com/go/compute/metadata"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
 )
 
 var (
@@ -74,7 +76,7 @@ func InitQuickBooksDebug() {
 //
 //	shared.InitQuickBooksProd(ctx)
 func InitQuickBooksProd(ctx context.Context) {
-	initOnce.Do(func() {
+	shared.InitQuickBooksOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
 			log.Fatalf("Error loading Google Cloud project ID: %v", err)
@@ -83,7 +85,7 @@ func InitQuickBooksProd(ctx context.Context) {
 		// Helper function to load a secret by its name
 		loadSecret := func(secretName string) string {
 			path := fmt.Sprintf("projects/%s/secrets/%s/versions/latest", projectID, secretName)
-			secret, err := GetSecretFromGCP(path)
+			secret, err := gcp.GetSecretFromGCP(path)
 			if err != nil {
 				log.Fatalf("Error fetching secret %s: %v", secretName, err)
 			}

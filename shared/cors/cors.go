@@ -1,4 +1,4 @@
-package shared
+package cors
 
 import (
 	"net/http"

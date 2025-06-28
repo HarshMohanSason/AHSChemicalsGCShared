@@ -1,4 +1,4 @@
-package shared
+package quickbooks
 
 import (
 	"bytes"
@@ -10,6 +10,8 @@ import (
 	"net/http"
 	"net/url"
 	"time"
+
+	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 )
 
 // ExchangeTokenForAuthCode exchanges an OAuth 2.0 authorization code for the first time access and refresh tokens
@@ -199,7 +201,7 @@ func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authDat
 		"state":         authData["state"],
 	}
 
-	_, err := FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData)
+	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData)
 	return err
 }
 
@@ -236,7 +238,7 @@ func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authDat
 //   - Ensure that `FirestoreClient` has been properly initialized before calling this function.
 //   - This function should typically be called before making authenticated requests to the QuickBooks API.
 func EnsureValidAccessToken(ctx context.Context, uid string) (string, error) {
-	docSnapshot, err := FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Get(ctx)
+	docSnapshot, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Get(ctx)
 	if err != nil || !docSnapshot.Exists() {
 		return "", fmt.Errorf("quickbooks authentication required")
 	}
