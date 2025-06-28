@@ -199,6 +199,7 @@ func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authDat
 		"token_type":    tokenData["token_type"],
 		"scope":         tokenData["scope"],
 		"state":         authData["state"],
+		"realm_id": 	 authData["realm_id"],
 	}
 
 	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData)

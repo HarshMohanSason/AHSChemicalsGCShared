@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
+	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 	"github.com/joho/godotenv"
 )
 
@@ -18,11 +18,11 @@ func main(){
 
 	//Load the firebase admin sdk's
 	if(os.Getenv("ENV") == "DEBUG"){
-		shared.InitFirebaseDebug(os.Getenv("FIREBASE_ADMIN_SDK_DEBUG"))
+	firebase_shared.InitFirebaseDebug(os.Getenv("FIREBASE_ADMIN_SDK_DEBUG"))
 		log.Print("Initialized firebase debug admin sdk")
 	}else{
 		path := os.Getenv("FIREBASE_ADMIN_SDK_PROD")
-		shared.InitFirebaseProd(&path)
+		firebase_shared.InitFirebaseProd(&path)
 		log.Print("Initialized firebase prod admin sdk")
 	}
 }
