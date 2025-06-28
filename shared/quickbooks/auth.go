@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 )
 
@@ -176,7 +177,7 @@ func RefreshToken(ctx context.Context, refreshToken string) (map[string]any, err
 // Parameters:
 //   - ctx: Context for request lifetime
 //   - tokenData: Token response data from QuickBooks (access_token, refresh_token, etc.)
-//   - authData: Metadata map including "uid" and "state"
+//   - authData: Metadata map including "uid", "state" and "realm_id"
 //
 // Returns:
 //   - error: Non-nil if an error occurs during Firestore save operation
@@ -202,70 +203,74 @@ func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authDat
 		"realm_id": 	 authData["realm_id"],
 	}
 
-	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData)
+	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData, firestore.MergeAll)
 	return err
 }
 
-// EnsureValidAccessToken retrieves and validates the QuickBooks access token for the specified user.
+// EnsureValidAccessToken retrieves and validates the QuickBooks access token and related OAuth data
+// for the specified user from Firestore.
 //
-// If the access token is expired, it automatically refreshes the token using the stored refresh token,
-// updates Firestore with the new token data, and returns the new access token.
+// If the stored token is expired, it automatically refreshes the token using the saved `refresh_token`,
+// updates Firestore with the new credentials, and returns the refreshed token data.
 //
 // Parameters:
-//   - ctx (context.Context): Context for request-scoped deadlines, cancellation, and logging.
-//   - uid (string): The user ID whose QuickBooks token should be retrieved and validated.
+//   - ctx: context.Context — request-scoped context for timeout, cancellation, etc.
+//   - uid: string — the unique user ID associated with the stored QuickBooks token.
 //
 // Returns:
-//   - string: A valid (non-expired) QuickBooks access token.
-//   - error: An error if the token does not exist, cannot be refreshed, or there are issues reading/writing Firestore.
+//   - map[string]any: A map representing the full token document, including fields like
+//     "access_token", "refresh_token", "expires_at", "realm_id", etc.
+//   - error: An error if token data is missing, expired and refresh fails, or Firestore operations fail.
 //
 // Behavior:
-//  1. Retrieves the QuickBooks token document for the given user (`uid`) from Firestore.
-//  2. If the document does not exist, returns an error indicating authentication is required.
-//  3. If the token has expired:
-//     - Attempts to refresh it using the stored `refresh_token`.
-//     - Saves the new token details to Firestore.
-//     - Returns the refreshed `access_token`.
-//  4. If the token is still valid, returns the current `access_token`.
+//   1. Retrieves the token document from the `quickbooks_tokens` collection using the provided UID.
+//   2. If the document is missing or invalid, returns an error indicating authentication is required.
+//   3. If the token is expired:
+//      - Refreshes the token using `RefreshToken()`
+//      - Persists the new token back to Firestore using `SaveTokenToFirestore()`
+//      - Returns the updated token data
+//   4. If the token is still valid, returns the existing token data.
 //
-// Example Usage:
+// Example usage:
 //
-//	accessToken, err := shared.EnsureValidAccessToken(ctx, userID)
+//	tokenData, err := EnsureValidAccessToken(ctx, userID)
 //	if err != nil {
-//	    // Handle error, potentially requiring the user to re-authenticate
+//	    log.Println("Re-authentication required:", err)
+//	    return
 //	}
-//
-// Notes:
-//   - Ensure that `FirestoreClient` has been properly initialized before calling this function.
-//   - This function should typically be called before making authenticated requests to the QuickBooks API.
-func EnsureValidAccessToken(ctx context.Context, uid string) (string, error) {
+//	accessToken := tokenData["access_token"].(string)
+//	realmID := tokenData["realm_id"].(string)
+func EnsureValidAccessToken(ctx context.Context, uid string) (map[string]any, error) {
 	docSnapshot, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Get(ctx)
 	if err != nil || !docSnapshot.Exists() {
-		return "", fmt.Errorf("quickbooks authentication required")
+		return nil, fmt.Errorf("quickbooks authentication required")
 	}
 
 	docData := docSnapshot.Data()
 	expiresAt, ok := docData["expires_at"].(time.Time)
 	if !ok {
-		return "", fmt.Errorf("invalid expires_at in token data")
+		return nil, fmt.Errorf("invalid expires_at in token data")
 	}
 
-	//If the token is expired, generate a new one
+	// Token expired — refresh
 	if time.Now().After(expiresAt) {
 		refreshToken := docData["refresh_token"].(string)
 		tokenResponse, err := RefreshToken(ctx, refreshToken)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
+
 		authData := map[string]string{
 			"uid":   docData["uid"].(string),
 			"state": docData["state"].(string),
 		}
 		err = SaveTokenToFirestore(ctx, tokenResponse, authData)
 		if err != nil {
-			return "", err
+			return nil, err
 		}
-		return tokenResponse["access_token"].(string), nil
+		return tokenResponse, nil
 	}
-	return docData["access_token"].(string), nil
+
+	// Still valid — return full token object
+	return docData, nil
 }
