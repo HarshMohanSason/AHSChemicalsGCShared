@@ -21,8 +21,12 @@ var (
 	// QUICKBOOKS_AUTH_CALLBACK_URL is the redirect URI used for QuickBooks OAuth callbacks.
 	QUICKBOOKS_AUTH_CALLBACK_URL string
 
+	// QUICBOOK_AUTH_CALLBACK_REDIRECT_URL is the redirect URI used to show user a confirmation page when quickbooks is authenticated 
+	QUICBOOK_AUTH_CALLBACK_REDIRECT_URL string
+	
 	// QUICKBOOKS_API_URL is the base url which contains either the debug or production api url.
 	QUICKBOOKS_API_URL string
+
 )
 
 // InitQuickBooksDebug initializes QuickBooks credentials for the **debug** environment.
@@ -49,7 +53,8 @@ func InitQuickBooksDebug() {
 	QUICKBOOKS_CLIENT_ID = os.Getenv("QUICKBOOKS_DEBUG_CLIENT_ID")
 	QUICKBOOKS_CLIENT_SECRET = os.Getenv("QUICKBOOKS_DEBUG_CLIENT_SECRET")
 	QUICKBOOKS_AUTH_CALLBACK_URL = os.Getenv("QUICKBOOKS_DEBUG_AUTH_CALLBACK_URL")
-	QUICKBOOKS_API_URL = os.Getenv("QUICKBOOKS_DEBUG_API_URL")
+	QUICBOOK_AUTH_CALLBACK_REDIRECT_URL = os.Getenv("QUICKBOOKS_DEBUG_AUTH_CALLBACK_REDIRECT_URL")
+	QUICKBOOKS_API_URL = os.Getenv("QUICKBOOKS_DEBUG_API_URL")	
 	log.Println("Initialized quickbooks credentials in debug...")
 }
 
@@ -100,6 +105,7 @@ func InitQuickBooksProd(ctx context.Context) {
 		QUICKBOOKS_CLIENT_ID = loadSecret("QUICKBOOKS_CLIENT_ID")
 		QUICKBOOKS_CLIENT_SECRET = loadSecret("QUICKBOOKS_CLIENT_SECRET")
 		QUICKBOOKS_AUTH_CALLBACK_URL = loadSecret("QUICKBOOKS_AUTH_CALLBACK_URL")
+		QUICBOOK_AUTH_CALLBACK_REDIRECT_URL = loadSecret("QUICKBOOKS_AUTH_CALLBACK_REDIRECT_URL")
 		QUICKBOOKS_API_URL = loadSecret("QUICKBOOKS_API_URL")
 		log.Println("QuickBooks credentials initialized for PRODUCTION environment.")
 	})
