@@ -13,16 +13,9 @@ import (
 )
 
 var (
-	// App holds the initialized Firebase App instance.
 	App *firebase.App
-
-	// AuthClient provides access to Firebase Authentication features.
 	AuthClient *auth.Client
-
-	// StorageClient provides access to Firebase Cloud Storage features.
 	StorageClient *storage.Client
-
-	// FirestoreClient provides access to Firestore database features.
 	FirestoreClient *firestore.Client
 )
 

@@ -10,9 +10,10 @@ import (
 //Available brands for the products
 var brands = []string{"MicroTECH", "ProBlend"}
 
-// ParseBrandName extracts the brand name from the given product name.
-// It compares the input against a known list of brands in a case-insensitive way.
-// Returns the matched brand or an empty string if no match is found.
+// ParseBrandName extracts the brand name from a product name formatted as:
+// "BrandName - Product Name".
+// It matches against a predefined list of brands in a case-insensitive manner.
+// Returns the matched brand name, or an empty string if no known brand is found.
 func ParseBrandName(productName string) string {
 	for _, brand := range brands {
 		if strings.Contains(strings.ToLower(productName), strings.ToLower(brand)) {
@@ -22,9 +23,12 @@ func ParseBrandName(productName string) string {
 	return ""
 }
 
-// ParseProductName removes the brand name from the given product name, if present.
-// This is useful for extracting the raw product title without branding.
-// The removal is case-insensitive, and the result is trimmed of extra spaces.
+// ParseProductName removes the brand name from the given product name,
+// assuming the format is: "BrandName - Product Name".
+// This is necessary because QuickBooks does not allow brand names,
+// so they are embedded in the product name string.
+// The function performs a case-insensitive match and removal,
+// and trims any leading/trailing spaces from the result.
 func ParseProductName(productName string) string {
 	brand := ParseBrandName(productName)
 	if brand != "" {
@@ -38,15 +42,24 @@ func ParseProductName(productName string) string {
 	return strings.TrimSpace(productName)
 }
 
-// ParseSKU parses a SKU string formatted as "SKU-Size-Unit-PackOf".
-// Example: "523423423-5-GAL-2" returns a map:
-// {
-//   "SKU": "523423423",
-//   "Size": 5.0,
-//   "SizeUnit": "GAL",
-//   "PackOf": 2,
-// }
-// If parsing fails (due to wrong format), it returns default empty values.
+// ParseSKU extracts structured product details from a SKU string formatted as:
+// "SKU-Size-Unit-PackOf".
+// This format is used because platforms like QuickBooks do not support
+// separate fields for size, units, or packaging information, so they are
+// embedded directly in the SKU string in quickbooks.
+//
+// Example input:
+//   "523423423-5-GAL-2"
+//
+// Returns a map:
+//   {
+//     "SKU":      "523423423",
+//     "Size":     5.0,
+//     "SizeUnit": "GAL",
+//     "PackOf":   2,
+//   }
+//
+// If parsing fails due to unexpected format, default zero or empty values are returned.
 func ParseSKU(productSKU string) map[string]any {
 	splitString := strings.SplitN(productSKU, "-", 4)
 	if len(splitString) == 4 {

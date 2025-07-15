@@ -89,7 +89,7 @@ func ValidateContactUsFormMessage(message string) error {
 	if message == "" {
 		return errors.New("Message is required")
 	}
-	reg, err := regexp.Compile(`^[a-zA-Z0-9\s.,'"!?;:\-_()\n\r]{10,1000}$`)
+	reg, err := regexp.Compile(`^[a-zA-Z0-9\s.,'"!?;:\-_()\n\r]{10,300}$`)
 	if err != nil {
 		return err
 	}

@@ -3,7 +3,7 @@ package quickbooks
 //Represents the response from Quickbooks when an error occurs
 type QBErrorResponse struct {
 	Fault QBErrorFault `json:"Fault"`
-	Time  string       `json:"time"` // Optional: depends if you care about this field
+	Time  string       `json:"time"`
 }
 
 type QBErrorFault struct {

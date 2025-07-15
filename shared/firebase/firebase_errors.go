@@ -11,12 +11,12 @@ import (
 // from JSON error responses originating from Firebase services.
 type FirebaseErrorResponse struct {
 	Error struct {
-		Code    int    `json:"code"`    // HTTP status code of the error.
-		Message string `json:"message"` // Summary message of the error.
+		Code    int    `json:"code"`    
+		Message string `json:"message"` 
 		Errors  []struct {
-			Message string `json:"message"` // Detailed error message.
-			Domain  string `json:"domain"`  // The service-specific domain of the error.
-			Reason  string `json:"reason"`  // Specific reason for the error.
+			Message string `json:"message"`
+			Domain  string `json:"domain"` 
+			Reason  string `json:"reason"` 
 		} `json:"errors"`
 	} `json:"error"`
 }

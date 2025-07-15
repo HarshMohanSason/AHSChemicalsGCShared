@@ -33,6 +33,6 @@ func GetIp(request *http.Request) string {
 		}
 	}
 
-	// If all else fails
+	// No IP found
 	return ""
 }

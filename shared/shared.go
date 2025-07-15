@@ -1,31 +1,19 @@
 package shared
 
-import "sync"
-
-var (
-	InitFirebaseOnce   sync.Once
-	InitQuickBooksOnce sync.Once
-	InitGCPOnce        sync.Once
-	InitSendGridOnce   sync.Once
-	InitTwilioOnce     sync.Once
+import (
+	"sync"
 )
 
-// Reference represents a reference to another QuickBooks entity.
-//
-// Fields:
-//   - Value: The unique ID of the referenced entity (required).
-//   - Name:  Optional human-readable name for the referenced entity.
-type Reference struct {
-	Value string `json:"value"`            // Required ID of the referenced entity.
-	Name  string `json:"name,omitempty"`   // Optional display name of the referenced entity.
-}
+var (
+	InitFirebaseOnce   sync.Once //Firebase initialize once
+	InitQuickBooksOnce sync.Once //Quickbooks initialize once
+	InitGCPOnce        sync.Once //Google cloud manager initialize once
+	InitSendGridOnce   sync.Once //Sendgrid initialize once
+	InitCompanyDetails sync.Once //Company details initialize once
+)
 
-// MetaData contains creation and update timestamps for QuickBooks entities.
-//
-// Fields:
-//   - CreateTime:      ISO 8601 timestamp of when the entity was created.
-//   - LastUpdatedTime: ISO 8601 timestamp of the most recent update to the entity.
+// Meta data for json returned by quickbooks for each product/customer/invoice etc...
 type MetaData struct {
-	CreateTime      string `json:"CreateTime,omitempty"`       // Timestamp of entity creation.
-	LastUpdatedTime string `json:"LastUpdatedTime,omitempty"`  // Timestamp of last entity update.
+	CreatedAt string `json:"CreateTime,omitempty"`
+	UpdatedAt string `json:"LastUpdatedTime,omitempty"`
 }

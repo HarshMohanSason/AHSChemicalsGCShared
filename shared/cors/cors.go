@@ -30,7 +30,6 @@ func CorsEnabledFunction(response http.ResponseWriter, request *http.Request) bo
 		origin = request.Header.Get("Origin")
 	}
 
-	// if the request's Origin header is in the list of allowed origins, set appropriate CORS headers
 	if allowedOrigins[origin] {
 		response.Header().Set("Access-Control-Allow-Origin", origin)
 		response.Header().Set("Access-Control-Allow-Methods", "GET, POST, DELETE, PUT, OPTIONS")
@@ -38,7 +37,6 @@ func CorsEnabledFunction(response http.ResponseWriter, request *http.Request) bo
 		response.Header().Set("Access-Control-Max-Age", "3600")
 	}
 
-	// Handle CORS preflight (OPTIONS) requests.
 	if request.Method == http.MethodOptions {
 		response.WriteHeader(http.StatusNoContent) // 204 No Content
 		return true

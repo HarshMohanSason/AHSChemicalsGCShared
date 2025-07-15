@@ -40,7 +40,6 @@ func WriteJSONSuccess(response http.ResponseWriter, statusCode int, message stri
 		payload["data"] = data
 	}
 
-	// Encode the response payload as JSON.
 	if err := json.NewEncoder(response).Encode(payload); err != nil {
 		log.Printf("JSON encode response error: %v", err)
 	}

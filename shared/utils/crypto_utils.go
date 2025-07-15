@@ -14,7 +14,7 @@ import (
 // Example:
 //   secret := generateRandomSecret()
 func GenerateRandomSecret() (string, error) {
-	b := make([]byte, 32) //32 byte slice
+	b := make([]byte, 32) 
 	if _, err := rand.Read(b); err != nil {
 		return "", err
 	}
