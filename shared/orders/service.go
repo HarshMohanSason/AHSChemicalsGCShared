@@ -90,13 +90,13 @@ func FetchCustomerPriceForEachProductID(productIDs map[string]float64, customerI
 		}
 
 		if _, exists := productIDs[product_id]; exists {
-			if docData["price"] == nil {
-				productIDs[product_id] = 0.0
-			} else {
-				value, ok := docData["price"].(float64)
-				if ok {
-					productIDs[product_id] = value
-				}
+			switch v := docData["price"].(type) {
+			case float64:
+				productIDs[product_id] = v
+			case int64:
+				productIDs[product_id] = float64(v)
+			default:
+				productIDs[product_id] = 0.0 // 0.0 is the default
 			}
 		}
 	}
