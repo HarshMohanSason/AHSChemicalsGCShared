@@ -39,7 +39,7 @@ func DrawPurchaseOrderProductsTable(order *orders.Order, c *canvas.Canvas) float
 	fontSize, _ := c.PDF.GetFontSize()
 	lineHeight := c.PDF.PointConvert(fontSize)
 
-	mappedOrders := orders.CreateOrderForPurchaseOrderPDF(order)
+	mappedOrders := orders.CreateTableRowValuesForPurchaseOrderPDF(order)
 
 	tableHeight := c.DrawTableRows(mappedOrders, colWidths, "center", canvas.PrimaryBlue, canvas.Black, lineHeight)
 	c.DrawBorder(canvas.TableWidth, tableHeight, 0.8, canvas.PrimaryBlue)

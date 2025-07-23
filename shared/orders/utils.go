@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/products"
@@ -27,20 +27,20 @@ func ValidateOrderItems(item *products.Item) error {
 }
 
 func ValidateOrder(order *Order) error {
-	if order.Uid == "" {
+	if order.Uid == "" {
 		return errors.New("validation failed: user id is required")
 	}
 	if order.Customer.ID == "" {
 		return errors.New("validation failed: customer ID is required")
-	}
-	if len(order.Items) == 0 {
-		return errors.New("validation failed: order must contain at least one item")
 	}
 	if order.TaxRate == 0 {
 		return errors.New("validation failed: tax rate must be provided")
 	}
 	if len(order.SpecialInstructions) > 200 {
 		return errors.New("validation failed: special instructions must be less than 200 characters")
+	}
+	if len(order.Items) == 0 {
+		return errors.New("validation failed: order must contain at least one item")
 	}
 	for _, item := range order.Items {
 		if err := ValidateOrderItems(&item); err != nil {
@@ -58,7 +58,7 @@ func GetCorrectOrderPricesForOrder(order *Order) error {
 
 	err := FetchCustomerPriceForEachProductID(productPricesMap, order.Customer.ID, context.Background())
 	if err != nil {
-			return fmt.Errorf("failed to fetch customer-specific pricing: %w", err)
+		return fmt.Errorf("failed to fetch customer-specific pricing: %w", err)
 	}
 
 	for i, item := range order.Items {
@@ -98,11 +98,13 @@ func FormatOrderForFirestore(order *Order) map[string]any {
 		formattedItems = append(formattedItems, map[string]any{
 			"Id":        item.ID,
 			"Quantity":  item.Quantity,
+			"UnitPrice": item.UnitPrice,
 		})
 	}
 
 	return map[string]any{
 		"CustomerId":          order.Customer.ID,
+		"CustomerName":        strings.ToLower(order.Customer.DisplayName),
 		"Uid":                 order.Uid,
 		"SpecialInstructions": order.SpecialInstructions,
 		"Items":               formattedItems,
@@ -114,20 +116,4 @@ func FormatOrderForFirestore(order *Order) map[string]any {
 		"CreatedAt":           order.CreatedAt,
 		"UpdatedAt":           order.UpdatedAt,
 	}
-}
-
-func CreateOrderForPurchaseOrderPDF(order *Order) [][]string {
-	var mappedOrders = make([][]string, 0)
-	
-	for _, item := range order.Items {
-		sku := item.SKU
-		description := fmt.Sprintf("%s - %s %.2f %s (Pack of %d)", item.Brand, item.Name, item.Size, item.SizeUnit, item.PackOf)
-		quantity := strconv.Itoa(item.Quantity)
-		price := fmt.Sprintf("$%.2f", item.UnitPrice)
-		total := fmt.Sprintf("$%.2f", item.UnitPrice*float64(item.Quantity))
-		
-		items := []string{sku, description, quantity, price, total}
-		mappedOrders = append(mappedOrders, items)
-	}
-	return mappedOrders
 }

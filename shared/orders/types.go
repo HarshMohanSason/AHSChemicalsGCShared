@@ -7,6 +7,14 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/products"
 )
 
+//Constants for order status
+const (
+	OrderStatusPending   = "PENDING"
+	OrderStatusApproved  = "APPROVED"
+	OrderStatusRejected  = "REJECTED"
+	OrderStatusDelivered = "DELIVERED"
+)
+
 type Order struct {
 	ID                  string             `json:"ID"`
 	Customer            customers.Customer `json:"Customer"`

@@ -9,7 +9,14 @@ import (
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
 )
 
-//Sends mail using sendgrid api
+//SendEmail sends an email to the recipents with the SendGrid api
+//
+// Parameters: 
+// 	- metaData: EmailMetaData struct with the data to be sent
+//
+// Returns: 
+// 	- *rest.Response: The response struct from the SendGrid api.
+// 	- error: Any error that may have occurred
 func SendEmail(metaData EmailMetaData) (*rest.Response, error){
 
 	from := mail.NewEmail("AHSChemicals", company_details.COMPANYEMAIL)
@@ -41,6 +48,7 @@ func SendEmail(metaData EmailMetaData) (*rest.Response, error){
 	message.AddPersonalizations(p)
 	message.SetTemplateID(metaData.TemplateID)
 
+	//Add any attachments if any
 	for _, item := range metaData.Attachments {
 		attachment := mail.NewAttachment()
 		attachment.SetType(item.MimeType)

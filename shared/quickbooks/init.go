@@ -9,11 +9,10 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
 )
-
 var (
-	QUICKBOOKS_CLIENT_ID                string
+	QUICKBOOKS_CLIENT_ID                string 
 	QUICKBOOKS_CLIENT_SECRET            string
-	QUICKBOOKS_AUTH_CALLBACK_URL        string //Redirect URL when first auth url is called and redirects the user to this
+	QUICKBOOKS_AUTH_CALLBACK_URL        string //Redirect URL. When the first authentication via initial auth url completes, it redirects to this url
 	QUICBOOK_AUTH_CALLBACK_REDIRECT_URL string //Redirects user to a successful login page when quickbooks is authenticated
 	QUICKBOOKS_API_URL                  string //base url which contains either the debug or production api url.
 )

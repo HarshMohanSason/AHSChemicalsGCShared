@@ -24,6 +24,7 @@ func CreateOrderInFirestore(order *Order, ctx context.Context) error {
 	return nil
 }
 
+// Uploads an order related file to storage (Invoice, Shipping Manifest, etc.)
 func UploadOrderRelatedFileToStorage(orderID string, base64Str string, fileName string, ctx context.Context) error {
 	log.Printf("Uploading an order related file to storage")
 
@@ -101,4 +102,23 @@ func FetchCustomerPriceForEachProductID(productIDs map[string]float64, customerI
 		}
 	}
 	return nil
+}
+
+func FetchOrderFromFirestore(orderID string, ctx context.Context) (*Order, error) {
+
+	log.Printf("Fetching an order from firestore")
+
+	docSnapshot, err := firebase_shared.FirestoreClient.Collection("orders").Doc(orderID).Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !docSnapshot.Exists() {
+		return nil, fmt.Errorf("order with ID %s not found", orderID)
+	}
+
+	var order Order
+	if err := docSnapshot.DataTo(&order); err != nil {
+		return nil, err
+	}
+	return &order, nil
 }

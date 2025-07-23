@@ -2,6 +2,11 @@ package products
 
 import "github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 
+const (
+	BrandMicrotech = "MicroTECH"
+	BrandProblend  = "ProBlend"
+)
+
 type Ref struct {
 	Value string `json:"value"`
 	Name  string `json:"name,omitempty"`
@@ -15,7 +20,7 @@ type SalesOrPurchase struct {
 }
 
 // Note** The Quantity field is different from the QtyOnHand. Quantity represents how much of the item was ordered when the order was placed. QtyOnHand is the quantity of the item on hand which is received from quickbooks api when sycning.
-// Size, SizeUnit, PackOf, Slug and Brand are not present in quickbooks api response. These are custom fields created when syncing. 
+// Size, SizeUnit, PackOf, Slug and Brand are not present in quickbooks api response. These are custom fields created when syncing.
 type Item struct {
 	ID                  string           `json:"Id,omitempty"`
 	Name                string           `json:"Name"`

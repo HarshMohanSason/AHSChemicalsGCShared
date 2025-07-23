@@ -172,41 +172,6 @@ func RefreshToken(ctx context.Context, refreshToken string) (map[string]any, err
 	return tokenResp, nil
 }
 
-// SaveTokenToFirestore saves the provided token data to Firestore with calculated expiration timestamps.
-//
-// Parameters:
-//   - ctx: Context for request lifetime
-//   - tokenData: Token response data from QuickBooks (access_token, refresh_token, etc.)
-//   - authData: Metadata map including "uid", "state" and "realm_id"
-//
-// Returns:
-//   - error: Non-nil if an error occurs during Firestore save operation
-func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authData map[string]string) error {
-	uid, ok := authData["uid"]
-	if !ok || uid == "" {
-		return fmt.Errorf("missing UID in authData")
-	}
-	// Calculate expiration timestamp
-	obtainedAt := time.Now()
-	expiresInSec := int64(tokenData["expires_in"].(float64))
-	expiresAt := obtainedAt.Add(time.Duration(expiresInSec) * time.Second)
-
-	firestoreData := map[string]any{
-		"access_token":  tokenData["access_token"],
-		"refresh_token": tokenData["refresh_token"],
-		"expires_in":    expiresInSec,
-		"obtained_at":   obtainedAt,
-		"expires_at":    expiresAt,
-		"token_type":    tokenData["token_type"],
-		"scope":         tokenData["scope"],
-		"state":         authData["state"],
-		"realm_id": 	 authData["realm_id"],
-	}
-
-	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData, firestore.MergeAll)
-	return err
-}
-
 // EnsureValidAccessToken retrieves and validates the QuickBooks access token and related OAuth data
 // for the specified user from Firestore.
 //
@@ -240,6 +205,7 @@ func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authDat
 //	}
 //	accessToken := tokenData["access_token"].(string)
 //	realmID := tokenData["realm_id"].(string)
+//
 func EnsureValidAccessToken(ctx context.Context, uid string) (map[string]any, error) {
 	docSnapshot, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Get(ctx)
 	if err != nil || !docSnapshot.Exists() {
@@ -273,4 +239,40 @@ func EnsureValidAccessToken(ctx context.Context, uid string) (map[string]any, er
 
 	// Still valid — return full token object
 	return docData, nil
+}
+
+// SaveTokenToFirestore saves the provided token data to Firestore with calculated expiration timestamps.
+//
+// Parameters:
+//   - ctx: Context for request lifetime
+//   - tokenData: Token response data from QuickBooks (access_token, refresh_token, etc.)
+//   - authData: Metadata map including "uid", "state" and "realm_id"
+//
+// Returns:
+//   - error: Non-nil if an error occurs during Firestore save operation
+//
+func SaveTokenToFirestore(ctx context.Context, tokenData map[string]any, authData map[string]string) error {
+	uid, ok := authData["uid"]
+	if !ok || uid == "" {
+		return fmt.Errorf("missing UID in authData")
+	}
+	// Calculate expiration timestamp
+	obtainedAt := time.Now()
+	expiresInSec := int64(tokenData["expires_in"].(float64))
+	expiresAt := obtainedAt.Add(time.Duration(expiresInSec) * time.Second)
+
+	firestoreData := map[string]any{
+		"access_token":  tokenData["access_token"],
+		"refresh_token": tokenData["refresh_token"],
+		"expires_in":    expiresInSec,
+		"obtained_at":   obtainedAt,
+		"expires_at":    expiresAt,
+		"token_type":    tokenData["token_type"],
+		"scope":         tokenData["scope"],
+		"state":         authData["state"],
+		"realm_id": 	 authData["realm_id"],
+	}
+
+	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, firestoreData, firestore.MergeAll)
+	return err
 }
