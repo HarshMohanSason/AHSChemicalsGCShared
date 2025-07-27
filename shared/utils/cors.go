@@ -1,8 +1,9 @@
-//package cors implements Cross-Origin Resource Sharing (CORS) for HTTP requests.
-package cors
+package utils
 
 import (
 	"net/http"
+
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 )
 
 // CorsEnabledFunction handles Cross-Origin Resource Sharing (CORS) for HTTP requests.
@@ -21,8 +22,9 @@ import (
 //   - false: If the request is not an OPTIONS preflight request (normal processing should continue).
 func CorsEnabledFunction(response http.ResponseWriter, request *http.Request) bool {
 	allowedOrigins := map[string]bool{
-		"http://localhost:3000":              true,
-		"https://azurehospitalitysupply.com": true,
+		constants.CorsAllowOriginDebug:      true,
+		constants.CorsAllowOriginStaging:    true,
+		constants.CorsAllowOriginProduction: true,
 	}
 
 	var origin string

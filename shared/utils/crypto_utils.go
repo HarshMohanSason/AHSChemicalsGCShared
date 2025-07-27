@@ -1,3 +1,4 @@
+//utils package contains common utility functions that are used across multiple packages in the application
 package utils
 
 import (

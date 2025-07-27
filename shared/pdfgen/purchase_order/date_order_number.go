@@ -1,13 +1,13 @@
 package purchase_order
 
 import (
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/orders"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firestore_models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/elements"
 )
 
 // DrawDateAndPONumber draws the date and purchase order number on the top right corner below the pdf title
-func DrawDateAndPONumber(o *orders.Order, c *canvas.Canvas) {
+func DrawDateAndPONumber(o *firestore_models.Order, c *canvas.Canvas) {
 
 	//Date
 	label := elements.Text{

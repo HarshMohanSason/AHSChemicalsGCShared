@@ -2,30 +2,29 @@ package canvas
 
 import (
 	"fmt"
+	"mime/multipart"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/customers"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/orders"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/elements"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
 	"github.com/phpdave11/gofpdf"
 )
 
 const (
 	TableWidth         = 179.0
-	TableHeaderHeight  = 6.0
 	TableHeaderPadding = 5.0 // Padding between the table header and the first row.
 )
 
 var (
-	PrimaryBlue             = [3]int{65, 83, 145}
-	PrimaryGreen            = [3]int{165, 199, 89}
-	White                   = [3]int{255, 255, 255}
-	Black                   = [3]int{0, 0, 0}
-	ShippingTableHeaders    = []string{"REQUISITIONER", "SHIP VIA", "F.O.B", "SHIPPING TERMS"}
-	ShippingTableValues     = [][]string{{"Robert Vodka", "In House", "Factory", "N/A"}}
-	ProductTableHeaders     = []string{"SKU", "DESCRIPTION", "QTY", "PRICE", "TOTAL"}
-	ShippingManifestHeaders = []string{"NUMBER OF UNITS", "HM TYPE", "CONTAINER DESCRIPTION AND CLASSIFICATION", "CLASS", "PRODUCT ID", "NET WEIGHT", "GROSS WEIGHT", "GROSS WEIGHT NHM", "GROSS WEIGHT HM"}
-	InvoiceTableHeaders     = []string{"Item", "Quantity", "Price per unit", "Amount"}
+	PrimaryBlue          = [3]int{65, 83, 145}
+	PrimaryGreen         = [3]int{165, 199, 89}
+	White                = [3]int{255, 255, 255}
+	Black                = [3]int{0, 0, 0}
+	ShippingTableHeaders = []string{"REQUISITIONER", "SHIP VIA", "F.O.B", "SHIPPING TERMS"}
+	ShippingTableValues  = [][]string{{"Robert Vodka", "In House", "Factory", "N/A"}}
+	ProductTableHeaders  = []string{"SKU", "DESCRIPTION", "QTY", "PRICE", "TOTAL"}
 )
 
 type Canvas struct {
@@ -53,14 +52,73 @@ func NewCanvas(pdf *gofpdf.Fpdf) *Canvas {
 }
 
 // Position helpers
-
 func (c *Canvas) MoveTo(x, y float64) { c.X = x; c.Y = y }
 func (c *Canvas) IncX(dx float64)     { c.X += dx }
 func (c *Canvas) IncY(dy float64)     { c.Y += dy }
 func (c *Canvas) DecX(dx float64)     { c.X -= dx }
 func (c *Canvas) DecY(dy float64)     { c.Y -= dy }
-func (c *Canvas) ResetX()             { c.X = c.BorderX + c.MarginLeft }
-func (c *Canvas) ResetY()             { c.Y = c.BorderY + c.MarginTop }
+func (c *Canvas) ResetX()             { c.X = c.MarginLeft }
+func (c *Canvas) ResetY()             { c.Y = c.MarginTop }
+
+// Text Drawing helpers
+func (c *Canvas) DrawText(text, font, style string, fontSize float64) {
+	textElement := elements.Text{
+		Text:  text,
+		Font:  font,
+		Style: style,
+		X:     c.X,
+		Y:     c.Y,
+		Size:  fontSize,
+		Color: Black,
+	}
+	textElement.Draw(c.PDF)
+}
+
+func (c *Canvas) DrawMultiLineText(text, font, style string, fontSize, allowedWidth float64) {
+
+	textElement := elements.Text{
+		Text:  text,
+		Font:  font,
+		Style: style,
+		X:     c.X,
+		Y:     c.Y,
+		Size:  fontSize,
+		Color: Black,
+	}
+	textElement.DrawMultipleLines(c.PDF, allowedWidth, "")
+}
+
+func (c *Canvas) DrawLabelWithText(label, value string, fontSize float64) {
+	text := elements.Text{
+		Text:  label,
+		Font:  "Arial",
+		Style: "B",
+		X:     c.X,
+		Y:     c.Y,
+		Size:  fontSize,
+		Color: Black,
+	}
+	textWidth := text.GetTextWidth(c.PDF)
+	text.Draw(c.PDF) //Draw the label
+
+	text.Text = value
+	text.Style = ""
+	text.X = c.X + textWidth
+	text.Draw(c.PDF) //Draw the value
+}
+
+func (c *Canvas) DrawImageFromBytes(image []byte, width, height float64) {
+
+	imageElement := elements.Image{
+		ImageBytes: image,
+		X:          c.X,
+		Y:          c.Y,
+		Width:      width,
+		Height:     height,
+		Flow:       false,
+	}
+	imageElement.Draw(c.PDF)
+}
 
 // Draw border rectangle
 func (c *Canvas) DrawBorder(width, height float64, thickness float64, color [3]int) {
@@ -79,18 +137,35 @@ func (c *Canvas) DrawCompanyLogo(width, height float64) {
 		Height:   height,
 		Flow:     false,
 	}
+	imageElement.DrawFromURL(c.PDF)
+}
+
+func (c *Canvas) DrawImageFromMultiPart(image multipart.File, width, height float64) {
+
+	imageBytes, err := utils.MultipartFileToBytes(image)
+	if err != nil {
+		fmt.Println(err)
+	}
+	imageElement := elements.Image{
+		ImageBytes: imageBytes,
+		X:          c.X,
+		Y:          c.Y,
+		Width:      width,
+		Height:     height,
+		Flow:       false,
+	}
 	imageElement.Draw(c.PDF)
 }
 
 // Draw title text with alignment inside border
-func (c *Canvas) DrawPDFTitle(title string, color [3]int, alignment string) {
+func (c *Canvas) DrawPDFTitle(title string, color [3]int, alignment string, fontSize float64) {
 	text := elements.Text{
 		Text:  title,
 		Font:  "Arial",
 		Style: "B",
 		X:     c.X,
 		Y:     c.Y,
-		Size:  24,
+		Size:  fontSize,
 		Color: color,
 	}
 	text.ApplyTextStyle(c.PDF)
@@ -108,23 +183,23 @@ func (c *Canvas) DrawPDFTitle(title string, color [3]int, alignment string) {
 		xAlignment = (c.BorderWidth / 2) - (textWidth / 2) + c.MarginLeft
 	}
 
-	c.MoveTo(xAlignment, 33)
+	c.MoveTo(xAlignment, c.Y)
 	text.X = c.X
 	text.Y = c.Y
 	text.Draw(c.PDF)
 }
 
-func (c *Canvas) DrawCompanyDetails() {
+func (c *Canvas) DrawCompanyDetails(fontSize float64) {
 	lines := []struct {
 		text  string
 		style string
 	}{
-		{company_details.COMPANYNAME, "B"},
+		{constants.CompanyName, "B"},
 		{company_details.COMPANYADDRESSLINE1, ""},
 		{company_details.COMPANYADDRESSLINE2, ""},
 		{"Phone: " + company_details.COMPANYPHONE, ""},
 		{"Email: " + company_details.COMPANYEMAIL, ""},
-		{"Website: " + company_details.COMPANYWEBSITEURL, ""},
+		{"Website: " + constants.CompanyName, ""},
 	}
 
 	for _, line := range lines {
@@ -132,7 +207,7 @@ func (c *Canvas) DrawCompanyDetails() {
 			Text:  line.text,
 			Font:  "Arial",
 			Style: line.style,
-			Size:  10,
+			Size:  fontSize,
 			X:     c.X,
 			Y:     c.Y,
 			Color: Black,
@@ -142,16 +217,16 @@ func (c *Canvas) DrawCompanyDetails() {
 	}
 }
 
-func (c *Canvas) DrawCustomerDetails(customer customers.Customer) {
+func (c *Canvas) DrawCustomerDetails(customer *models.Customer) {
 	lines := []struct {
 		text  string
 		style string
 	}{
-		{customer.DisplayName, "B"},
-		{customer.BillAddr.Line1, ""},
-		{fmt.Sprintf("%s, %s %s", customer.BillAddr.City, customer.BillAddr.CountrySubDivisionCode, customer.BillAddr.PostalCode), ""},
-		{"Phone: " + customer.PrimaryPhone.FreeFormNumber, ""},
-		{"Email: " + customer.PrimaryEmailAddr.Address, ""},
+		{customer.Name, "B"},
+		{customer.Address1, ""},
+		{customer.FormatAddress2(), ""},
+		{"Phone: " + customer.Phone, ""},
+		{"Email: " + customer.Email, ""},
 	}
 
 	for _, line := range lines {
@@ -169,7 +244,20 @@ func (c *Canvas) DrawCustomerDetails(customer customers.Customer) {
 	}
 }
 
-func (c *Canvas) DrawTableHeaders(headers []string, colWidths []float64, fillColor [3]int, textColor [3]int) {
+func (c *Canvas) DrawTableHeaders(headers []string, colWidths []float64, fillColor [3]int, textColor [3]int, fontSize float64) float64 {
+	var maxRectHeight float64
+	for i, header := range headers {
+		textElement := elements.Text{
+			Text:  header,
+			Font:  "Arial",
+			Style: "B",
+			Size:  fontSize,
+			Color: textColor,
+		}
+		lineHeight := textElement.GetTextHeight(c.PDF)
+		maxRectHeight = max(textElement.GetMultiLineHeight(c.PDF, colWidths[i], lineHeight), maxRectHeight)
+	}
+	maxRectHeight += 5 //Padding for the table heade rect
 
 	for i, header := range headers {
 		//Draw the rectangle
@@ -177,38 +265,49 @@ func (c *Canvas) DrawTableHeaders(headers []string, colWidths []float64, fillCol
 			X:         c.X,
 			Y:         c.Y,
 			Width:     colWidths[i],
-			Height:    TableHeaderHeight,
+			Height:    maxRectHeight,
 			Style:     "F",
 			FillColor: fillColor,
 		}
 		rect.Draw(c.PDF)
-		c.IncY(TableHeaderHeight / 2)
+		c.IncY(maxRectHeight / 2)
 
-		//Draw the text inside the rectangle
+		//Draw the header text
 		textElement := elements.Text{
 			Text:  header,
 			Font:  "Arial",
 			Style: "B",
 			X:     c.X,
-			Y:     c.Y + 0.5,
-			Size:  10,
+			Y:     c.Y,
+			Size:  fontSize,
 			Color: textColor,
 		}
+		//Centering the header text in the rectangle
+		lineHeight := textElement.GetTextHeight(c.PDF)
+		multiLineHeight := textElement.GetMultiLineHeight(c.PDF, colWidths[i], lineHeight)
+
+		textCenterYPos := c.Y + (maxRectHeight / 2) - (multiLineHeight / 2) - (lineHeight / 2)
+		textElement.Y = textCenterYPos
+
 		textElement.DrawMultipleLines(c.PDF, colWidths[i], "center")
 
 		//Reset positions to draw next cell
-		c.DecY(TableHeaderHeight / 2)
+		c.DecY(maxRectHeight / 2)
 		c.IncX(colWidths[i])
 	}
+	return maxRectHeight
 }
 
 func (c *Canvas) DrawTableRows(
 	values [][]string,
 	colWidths []float64,
+	tableHeaderHeight float64,
+	tableWidth float64,
 	align string,
 	fillColor, textColor [3]int,
 	lineHeight float64,
 ) float64 {
+	startXPos := c.X
 	startYPos := c.Y
 	tableHeight := 0.0
 
@@ -228,15 +327,15 @@ func (c *Canvas) DrawTableRows(
 		// Check if adding this row will overflow the page
 		if c.Y+maxRowHeight > c.BorderHeight {
 			//Finish drawing this table
-			tableHeight += TableHeaderHeight + TableHeaderPadding
-			c.MoveTo(c.MarginLeft, startYPos-TableHeaderHeight-TableHeaderPadding)
-			c.DrawBorder(TableWidth, tableHeight, 0.8, PrimaryBlue)
-			c.DrawTableCellRightBorder(len(values[0])-1, colWidths, 0.8, tableHeight, PrimaryBlue)
+			tableHeight += tableHeaderHeight + TableHeaderPadding
+			c.MoveTo(c.MarginLeft, startYPos-(tableHeaderHeight+TableHeaderPadding)) //We draw below the table headers
+			c.DrawBorder(tableWidth, tableHeight, 0.8, fillColor)
+			c.DrawTableCellRightBorder(len(values[0])-1, colWidths, 0.8, tableHeight, fillColor)
 
 			// Start new page
 			c.PDF.AddPage()
 			c.MoveTo(c.BorderX, c.BorderY)
-			c.DrawBorder(c.BorderWidth, c.BorderHeight, 0.8, PrimaryBlue)
+			c.DrawBorder(c.BorderWidth, c.BorderHeight, 0.8, fillColor)
 
 			c.MoveTo(c.MarginLeft, c.MarginTop+15)
 			startYPos = c.Y
@@ -255,12 +354,12 @@ func (c *Canvas) DrawTableRows(
 			c.IncX(colWidths[j])
 		}
 
-		c.DecX(TableWidth)
+		c.MoveTo(startXPos, c.Y)
 		c.IncY(maxRowHeight)
 		tableHeight += maxRowHeight
 	}
-	c.MoveTo(c.MarginLeft, startYPos-TableHeaderHeight-TableHeaderPadding) //Resetting the Y position to draw the entire table.
-	return tableHeight + TableHeaderHeight
+	c.MoveTo(c.MarginLeft, startYPos-tableHeaderHeight-TableHeaderPadding) //Resetting the Y position to draw the entire table.
+	return tableHeight + tableHeaderHeight
 }
 
 func (c *Canvas) DrawTableCellRightBorder(len int, colWidths []float64, thickness, tableHeight float64, borderColor [3]int) {
@@ -280,7 +379,7 @@ func (c *Canvas) DrawTableCellRightBorder(len int, colWidths []float64, thicknes
 	}
 }
 
-func (c *Canvas) DrawBill(order *orders.Order) {
+func (c *Canvas) DrawBill(order *models.Order) {
 	const lineSpacing = 5.0
 	const valueOffsetX = 35.0
 

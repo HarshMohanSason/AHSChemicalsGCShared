@@ -1,43 +1,50 @@
-package utils
+// Validation package handles complex validations in the shared package
+package validation
 
 import (
 	"errors"
 	"regexp"
+	"strings"
+
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 )
 
-// ValidateContactUsForm validates all fields of the contact us form.
-// The `form` map is expected to contain the following keys:
-// "email", "name", "phone", "location", and "message", each with string values.
+// ValidateContactUsForm performs validation on each field of the ContactUsForm.
+// It returns the first encountered error to signal a failed validation.
 //
-// Returns:
-//   - error: If any of the individual validations fail, the corresponding error is returned.
-func ValidateContactUsForm(form map[string]any) error {
-	if err := ValidateContactUsFormEmail(form["email"].(string)); err != nil {
+// Validation rules:
+// - Email must be a valid email address format.
+// - Name must contain only alphabetic characters and spaces.
+// - Phone must contain only digits and be between 7 to 15 characters.
+// - Location must consist of alphanumeric characters and basic punctuation.
+// - Message must be plain text with no special characters or HTML tags.
+func ValidateContactUsForm(c *models.ContactUsForm) error {
+	if err := validateEmail(c.Email); err != nil {
 		return err
 	}
-	if err := ValidateContactUsFormName(form["name"].(string)); err != nil {
+	if err := validateName(c.Name); err != nil {
 		return err
 	}
-	if err := ValidateContactUsFormPhone(form["phone"].(string)); err != nil {
+	if err := validatePhone(c.Phone); err != nil {
 		return err
 	}
-	if err := ValidateContactUsFormLocation(form["location"].(string)); err != nil {
+	if err := validateLocation(c.Location); err != nil {
 		return err
 	}
-	if err := ValidateContactUsFormMessage(form["message"].(string)); err != nil {
+	if err := validateMessage(c.Message); err != nil {
 		return err
 	}
 	return nil
 }
 
-// ValidateContactUsFormEmail checks that the email is non-empty and conforms to a valid email format.
+// validateEmail checks that the email is non-empty and conforms to a valid email format.
 //
 // Parameters:
 //   - email: The email string to validate.
 //
 // Returns:
 //   - error: If the email is missing or improperly formatted.
-func ValidateContactUsFormEmail(email string) error {
+func validateEmail(email string) error {
 	if email == "" {
 		return errors.New("Email is required")
 	}
@@ -51,35 +58,36 @@ func ValidateContactUsFormEmail(email string) error {
 	return nil
 }
 
-// ValidateContactUsFormName checks that the name is non-empty and consists of two words (first and last name).
+// validateName checks that the name is non-empty and consists of two words (first and last name).
 //
 // Parameters:
 //   - name: The full name string to validate.
 //
 // Returns:
 //   - error: If the name is missing or doesn't follow the format "Firstname Lastname".
-func ValidateContactUsFormName(name string) error {
+func validateName(name string) error {
+	name = strings.TrimSpace(name)
 	if name == "" {
 		return errors.New("Name is required")
 	}
-	reg, err := regexp.Compile(`^[a-zA-Z]+\s[a-zA-Z]+$`)
+	reg, err := regexp.Compile(`^[A-Za-z]+(?:\s+[A-Za-z]+)+$`)
 	if err != nil {
 		return err
 	}
 	if !reg.MatchString(name) {
-		return errors.New("Invalid name entered. Please enter the name in the correct format")
+		return errors.New("Invalid name entered. Please enter your full name (first and last)")
 	}
 	return nil
 }
 
-// ValidateContactUsFormPhone checks that the phone number is exactly 10 digits.
+// validatePhone checks that the phone number is exactly 10 digits.
 //
 // Parameters:
 //   - phone: The phone number string to validate.
 //
 // Returns:
 //   - error: If the phone is missing or doesn't contain exactly 10 digits.
-func ValidateContactUsFormPhone(phone string) error {
+func validatePhone(phone string) error {
 	if phone == "" {
 		return errors.New("Phone number is required")
 	}
@@ -93,7 +101,7 @@ func ValidateContactUsFormPhone(phone string) error {
 	return nil
 }
 
-// ValidateContactUsFormLocation checks that the location is non-empty and between 10 to 50 characters long,
+// validateLocation checks that the location is non-empty and between 10 to 50 characters long,
 // allowing alphanumeric characters, spaces, commas, periods, underscores, and hyphens.
 //
 // Parameters:
@@ -101,7 +109,7 @@ func ValidateContactUsFormPhone(phone string) error {
 //
 // Returns:
 //   - error: If the location is missing or contains disallowed characters.
-func ValidateContactUsFormLocation(location string) error {
+func validateLocation(location string) error {
 	if location == "" {
 		return errors.New("Location is required")
 	}
@@ -115,7 +123,7 @@ func ValidateContactUsFormLocation(location string) error {
 	return nil
 }
 
-// ValidateContactUsFormMessage checks that the message is non-empty and between 10 to 300 characters,
+// validateMessage checks that the message is non-empty and between 10 to 300 characters,
 // allowing letters, numbers, spaces, and selected punctuation characters.
 //
 // Parameters:
@@ -123,7 +131,7 @@ func ValidateContactUsFormLocation(location string) error {
 //
 // Returns:
 //   - error: If the message is missing or contains disallowed characters.
-func ValidateContactUsFormMessage(message string) error {
+func validateMessage(message string) error {
 	if message == "" {
 		return errors.New("Message is required")
 	}

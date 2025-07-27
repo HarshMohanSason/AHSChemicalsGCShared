@@ -1,11 +1,13 @@
 package utils
 
-//HasDuplicates checks if a slice contains any duplicates. 
+import "time"
+
+//HasDuplicates checks if a slice contains any duplicates.
 //
-//Parameters: 
+//Parameters:
 // - slice: The slice of type string to check
 //
-//Returns: 
+//Returns:
 // - bool: True if the slice contains any duplicates, false otherwise
 func HasDuplicates(slice []string) bool {
 	seen := make(map[string]bool)
@@ -16,4 +18,9 @@ func HasDuplicates(slice []string) bool {
 		seen[val] = true
 	}
 	return false
+}
+
+//FormatDate formats a time.Time object into a string in the format "January 2, 2006 at 3:04 PM"
+func FormatDate(t time.Time) string {
+	return t.Format("January 2, 2006 at 3:04 PM")
 }

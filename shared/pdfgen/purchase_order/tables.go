@@ -1,17 +1,17 @@
 package purchase_order
 
 import (
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/orders"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firestore_models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
 )
 
 func DrawPurchaseOrderShippingTable(c *canvas.Canvas) float64 {
 
 	colWidths := []float64{35, 40, 35, 69}
-	c.DrawTableHeaders(canvas.ShippingTableHeaders, colWidths, canvas.PrimaryBlue, canvas.White)
+	tableHeaderHeight := c.DrawTableHeaders(canvas.ShippingTableHeaders, colWidths, canvas.PrimaryBlue, canvas.White, 10)
 
 	c.DecX(canvas.TableWidth)
-	c.IncY(canvas.TableHeaderHeight + canvas.TableHeaderPadding)
+	c.IncY(tableHeaderHeight + canvas.TableHeaderPadding)
 
 	//Set the fonts to get appropriate line height
 	c.PDF.SetFont("Arial", "", 9)
@@ -19,19 +19,19 @@ func DrawPurchaseOrderShippingTable(c *canvas.Canvas) float64 {
 	fontSize, _ := c.PDF.GetFontSize()
 	lineHeight := c.PDF.PointConvert(fontSize)
 
-	tableHeight := c.DrawTableRows(canvas.ShippingTableValues, colWidths, "center", canvas.PrimaryBlue, canvas.Black, lineHeight)
+	tableHeight := c.DrawTableRows(canvas.ShippingTableValues, colWidths, tableHeaderHeight, 179, "center", canvas.PrimaryBlue, canvas.Black, lineHeight)
 	c.DrawBorder(canvas.TableWidth, tableHeight, 0.8, canvas.PrimaryBlue)
 	c.DrawTableCellRightBorder(len(canvas.ShippingTableHeaders)-1, colWidths, 0.8, tableHeight, canvas.PrimaryBlue)
 	return c.Y + tableHeight
 }
 
-func DrawPurchaseOrderProductsTable(order *orders.Order, c *canvas.Canvas) float64 {
+func DrawPurchaseOrderProductsTable(order *firestore_models.Order, c *canvas.Canvas) float64 {
 
 	colWidths := []float64{30, 74, 15, 30, 30}
-	c.DrawTableHeaders(canvas.ProductTableHeaders, colWidths, canvas.PrimaryBlue, canvas.White)
+	tableHeaderHeight := c.DrawTableHeaders(canvas.ProductTableHeaders, colWidths, canvas.PrimaryBlue, canvas.White, 10)
 
 	c.DecX(canvas.TableWidth)
-	c.IncY(canvas.TableHeaderHeight + canvas.TableHeaderPadding)
+	c.IncY(tableHeaderHeight + canvas.TableHeaderPadding)
 
 	//Set the fonts to get appropriate line height
 	c.PDF.SetFont("Arial", "", 9)
@@ -41,7 +41,7 @@ func DrawPurchaseOrderProductsTable(order *orders.Order, c *canvas.Canvas) float
 
 	mappedOrders := orders.CreateTableRowValuesForPurchaseOrderPDF(order)
 
-	tableHeight := c.DrawTableRows(mappedOrders, colWidths, "center", canvas.PrimaryBlue, canvas.Black, lineHeight)
+	tableHeight := c.DrawTableRows(mappedOrders, colWidths, tableHeaderHeight, 179,"center", canvas.PrimaryBlue, canvas.Black, lineHeight)
 	c.DrawBorder(canvas.TableWidth, tableHeight, 0.8, canvas.PrimaryBlue)
 	c.DrawTableCellRightBorder(len(canvas.ProductTableHeaders)-1, colWidths, 0.8, tableHeight, canvas.PrimaryBlue)
 	return c.Y + tableHeight

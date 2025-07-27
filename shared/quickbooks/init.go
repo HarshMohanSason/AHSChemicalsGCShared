@@ -9,6 +9,7 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
 )
+
 var (
 	QUICKBOOKS_CLIENT_ID                string 
 	QUICKBOOKS_CLIENT_SECRET            string
@@ -45,6 +46,49 @@ func InitQuickBooksDebug() {
 		log.Fatalf("Error initializing QuickBooks credentials: missing required environment variables")
 	}
 	log.Println("Initialized quickbooks credentials in debug...")
+}
+
+// InitQuickBooksStaging initializes QuickBooks credentials for the **staging** environment.
+//
+// It retrieves credentials from **Google Secret Manager** using the project ID fetched from
+// the GCP Metadata server (only available in GCP environments).
+//
+// This function is **intended for production deployments** and uses `sync.Once` to ensure
+// initialization happens only once during the program lifecycle.
+//
+// Secrets required in Secret Manager (one latest version each):
+//   - QUICKBOOKS_CLIENT_ID
+//   - QUICKBOOKS_CLIENT_SECRET
+//   - QUICKBOOKS_AUTH_CALLBACK_URL
+//   - QUICKBOOKS_API_URL
+//
+// Parameters:
+//
+//	ctx - context.Context from the calling function, usually the incoming HTTP request context.
+//
+// Logs:
+//
+//	Fatal errors if the project ID cannot be determined, or any of the required secrets cannot be fetched.
+//	Success message if successfully initialized
+func InitQuickBooksStaging(ctx context.Context) {
+	shared.InitQuickBooksOnce.Do(func() {
+		projectID, err := metadata.ProjectIDWithContext(ctx)
+		if err != nil {
+			log.Fatalf("Error loading Google Cloud project ID: %v", err)
+		}
+
+		// Load all QuickBooks-related secrets
+		QUICKBOOKS_CLIENT_ID = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_CLIENT_ID")
+		QUICKBOOKS_CLIENT_SECRET = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_CLIENT_SECRET")
+		QUICKBOOKS_AUTH_CALLBACK_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_AUTH_CALLBACK_URL")
+		QUICBOOK_AUTH_CALLBACK_REDIRECT_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_AUTH_CALLBACK_REDIRECT_URL")
+		QUICKBOOKS_API_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_API_URL")
+
+		if QUICKBOOKS_CLIENT_ID == "" || QUICKBOOKS_CLIENT_SECRET == "" || QUICKBOOKS_AUTH_CALLBACK_URL == "" || QUICKBOOKS_API_URL == "" {
+			log.Fatalf("Error initializing QuickBooks credentials: missing required environment variables")
+		}
+		log.Println("QuickBooks credentials initialized for PRODUCTION environment.")
+	})
 }
 
 // InitQuickBooksProd initializes QuickBooks credentials for the **production** environment.

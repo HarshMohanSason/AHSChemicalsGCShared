@@ -1,14 +1,13 @@
 package purchase_order
 
 import (
-
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/orders"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firestore_models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
 	"github.com/phpdave11/gofpdf"
 )
 
-func CreatePurchaseOrderPDF(order *orders.Order) (string, error) {
+func CreatePurchaseOrderPDF(order *firestore_models.Order) (string, error) {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 
@@ -18,12 +17,11 @@ func CreatePurchaseOrderPDF(order *orders.Order) (string, error) {
 
 	c.MoveTo(c.MarginLeft, 10)
 	c.DrawCompanyLogo(65, 0)
-
-	c.DrawPDFTitle("PURCHASE ORDER", canvas.PrimaryBlue, "right")
-
+	c.MoveTo(c.MarginLeft, 33)
+	c.DrawPDFTitle("PURCHASE ORDER", canvas.PrimaryBlue, "right", 24)
 	c.MoveTo(c.MarginLeft, 40)
-
-	c.DrawCompanyDetails()
+	
+	c.DrawCompanyDetails(10)
 
 	c.MoveTo(c.BorderWidth-60, 40)
 
@@ -33,7 +31,7 @@ func CreatePurchaseOrderPDF(order *orders.Order) (string, error) {
 
 	DrawVendorShipToSectionHeading("VENDOR", c)
 	c.IncY(10)
-	c.DrawCompanyDetails()
+	c.DrawCompanyDetails(10)
 
 	c.MoveTo(c.BorderWidth-70, 70)
 
@@ -52,8 +50,14 @@ func CreatePurchaseOrderPDF(order *orders.Order) (string, error) {
 
 	c.MoveTo(c.BorderWidth-58, tablePos+5)
 	c.DrawBill(order)
-
+	
 	c.DrawFooter("purchase order")
 
-	return utils.GeneratePDFBase64(pdf)
+	err := utils.GeneratePDFFileInPath(pdf, "purchase_order")
+	if err != nil {
+		//log.Print(err)
+	}
+
+	return "", err
+	//return utils.GeneratePDFBase64(pdf)
 }

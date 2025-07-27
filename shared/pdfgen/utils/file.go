@@ -4,6 +4,8 @@ import (
 	"bytes"
 	"encoding/base64"
 	"fmt"
+	"io"
+	"mime/multipart"
 	"os"
 
 	"github.com/phpdave11/gofpdf"
@@ -33,4 +35,9 @@ func GeneratePDFBase64 (pdf *gofpdf.Fpdf) (string, error) {
 	}
 	base64Str := base64.StdEncoding.EncodeToString(buf.Bytes())
 	return base64Str, nil
+}
+
+func MultipartFileToBytes(file multipart.File) ([]byte, error) {
+	defer file.Close()
+	return io.ReadAll(file)
 }
