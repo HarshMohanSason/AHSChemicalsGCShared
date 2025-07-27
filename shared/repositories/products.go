@@ -1,4 +1,4 @@
-package firestore_repositories
+package repositories
 
 import (
 	"context"
@@ -37,7 +37,7 @@ func FetchProductByIDs(ids []string, ctx context.Context) ([]models.Product, err
 
 	for _, doc := range docSnapshots {
 		if !doc.Exists() {
-			log.Println("No document exists for the user when calling FetchProductByIDs: %s", doc.Ref.ID)
+			log.Printf("No document exists for the user when calling FetchProductByIDs: %s", doc.Ref.ID)
 			continue // Moving on to next iteration if the document doesn't exist
 		}
 		var item models.Product

@@ -51,7 +51,7 @@ func InitSendGridStaging(ctx context.Context) {
 		if err != nil {
 			log.Fatalf("Error loading Google Cloud project ID: %v", err)
 		}
-		SENDGRID_API_KEY = gcp.LoadSecretsHelper(projectID, "SENDGRID_API_KEY_STAGING")
+		SENDGRID_API_KEY = gcp.LoadSecretsHelper(projectID, "SENDGRID_API_KEY")
 		if SENDGRID_API_KEY == "" {
 			log.Fatal("SENDGRID_API_KEY_STAGING is not set")
 		}

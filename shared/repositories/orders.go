@@ -1,4 +1,4 @@
-package firestore_repositories
+package repositories
 
 import (
 	"context"
