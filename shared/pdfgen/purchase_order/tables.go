@@ -1,7 +1,7 @@
 package purchase_order
 
 import (
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firestore_models"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
 )
 
@@ -25,7 +25,7 @@ func DrawPurchaseOrderShippingTable(c *canvas.Canvas) float64 {
 	return c.Y + tableHeight
 }
 
-func DrawPurchaseOrderProductsTable(order *firestore_models.Order, c *canvas.Canvas) float64 {
+func DrawPurchaseOrderProductsTable(order *models.Order, c *canvas.Canvas) float64 {
 
 	colWidths := []float64{30, 74, 15, 30, 30}
 	tableHeaderHeight := c.DrawTableHeaders(canvas.ProductTableHeaders, colWidths, canvas.PrimaryBlue, canvas.White, 10)

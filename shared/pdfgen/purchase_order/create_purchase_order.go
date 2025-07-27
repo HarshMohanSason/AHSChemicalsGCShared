@@ -1,13 +1,13 @@
 package purchase_order
 
 import (
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firestore_models"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
 	"github.com/phpdave11/gofpdf"
 )
 
-func CreatePurchaseOrderPDF(order *firestore_models.Order) (string, error) {
+func CreatePurchaseOrderPDF(order *models.Order) (string, error) {
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 

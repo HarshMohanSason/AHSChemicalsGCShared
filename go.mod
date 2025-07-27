@@ -5,14 +5,15 @@ go 1.24.2
 require (
 	cloud.google.com/go/compute/metadata v0.7.0
 	cloud.google.com/go/firestore v1.18.0
+	cloud.google.com/go/logging v1.13.0
 	cloud.google.com/go/secretmanager v1.15.0
 	firebase.google.com/go/v4 v4.15.2
-	github.com/google/martian/v3 v3.3.3
 	github.com/joho/godotenv v1.5.1
 	github.com/phpdave11/gofpdf v1.4.3
 	github.com/sendgrid/rest v2.6.9+incompatible
 	github.com/sendgrid/sendgrid-go v3.16.1+incompatible
 	google.golang.org/api v0.237.0
+	google.golang.org/grpc v1.73.0
 )
 
 require (
@@ -65,6 +66,5 @@ require (
 	google.golang.org/genproto v0.0.0-20250505200425-f936aa4a68b2 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20250603155806-513f23925822 // indirect
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20250603155806-513f23925822 // indirect
-	google.golang.org/grpc v1.73.0 // indirect
 	google.golang.org/protobuf v1.36.6 // indirect
 )

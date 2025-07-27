@@ -1,4 +1,4 @@
-// package gcp is a helper package for loading secrets from GCP
+// package gcp is a helper package for shared utility functions required for GCP.
 package gcp
 
 import (
