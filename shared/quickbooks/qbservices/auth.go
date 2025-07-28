@@ -15,7 +15,6 @@ import (
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbservices"
 )
 
 // ExchangeTokenForAuthCode exchanges an authorization code fetched from the auth callback url for the token reponse from QuickBooks.
@@ -42,7 +41,7 @@ func ExchangeTokenForAuthCode(ctx context.Context, authCode string) (*qbmodels.Q
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, qbservices.ReturnQBOAuthError(err)
+		return nil, ReturnQBOAuthError(err)
 	}
 
 	defer resp.Body.Close()
@@ -86,7 +85,7 @@ func refreshToken(ctx context.Context, refreshToken string) (*qbmodels.QBReponse
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, qbservices.ReturnQBOAuthError(err)
+		return nil, ReturnQBOAuthError(err)
 	}
 	defer resp.Body.Close()
 
