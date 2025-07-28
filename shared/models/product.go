@@ -32,8 +32,8 @@ type Product struct {
 	UpdatedAt time.Time `json:"updatedAt" firestore:"updatedAt"`
 }
 
-func (p *Product) MapToFirestore() map[string]any {
-	return map[string]any{
+func (p *Product) MapToFirestore() map[string]interface{}{
+	return map[string]interface{}{
 		"id":        p.ID,
 		"isActive":  p.IsActive,
 		"brand":     p.Brand,
