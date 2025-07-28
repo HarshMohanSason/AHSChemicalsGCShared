@@ -11,15 +11,29 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+// SaveContactUsToFirestore saves contact us form to firestore
+//
+// Parameters:
+// c *models.ContactUsForm - contact us form pointer to the struct
+// ip string - ip address of the client
+// ctx context.Context - context of the request
+//
+// Returns:
+// error - error if any
 func SaveContactUsToFirestore(c *models.ContactUsForm, ip string, ctx context.Context) error {
 
 	docSnapshot, err := firebase_shared.FirestoreClient.Collection("contact_us").Doc(ip).Get(ctx)
+
 	if err != nil {
-		// Document does not exist, create it
 		if status.Code(err) == codes.NotFound {
 			_, err = firebase_shared.FirestoreClient.Collection("contact_us").Doc(ip).Set(ctx, c)
 			return err
 		}
+		return err
+	}
+
+	if !docSnapshot.Exists() {
+		_, err = firebase_shared.FirestoreClient.Collection("contact_us").Doc(ip).Set(ctx, c)
 		return err
 	}
 
@@ -33,7 +47,6 @@ func SaveContactUsToFirestore(c *models.ContactUsForm, ip string, ctx context.Co
 		return errors.New("You need to wait 24 hours before submitting another contact us request")
 	}
 
-	//Save the contact us form
 	_, err = firebase_shared.FirestoreClient.Collection("contact_us").Doc(ip).Set(ctx, c)
 	if err != nil {
 		return err
