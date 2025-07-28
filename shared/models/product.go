@@ -6,9 +6,14 @@ import (
 	"time"
 )
 
+type ItemMinimal struct {
+	ID       string  `firestore:"id"`
+	Price    float64 `firestore:"price"`
+	Quantity int     `firestore:"quantity"`
+}
+
 type Product struct {
-	ID        string    `json:"id" firestore:"om"`
-	QBID      string    `json:"qbid" firestore:"qbid"` //quickbooks ID
+	ID        string    `json:"id" firestore:"id"`
 	IsActive  bool      `json:"isActive" firestore:"isActive"`
 	Brand     string    `json:"brand" firestore:"brand"`
 	Name      string    `json:"name" firestore:"name"`
@@ -27,10 +32,26 @@ type Product struct {
 	UpdatedAt time.Time `json:"updatedAt" firestore:"updatedAt"`
 }
 
-type ItemMinimal struct {
-	ID       string  `firestore:"id"`
-	Price    float64 `firestore:"price"`
-	Quantity int     `firestore:"quantity"`
+func (p *Product) MapToFirestore() map[string]any {
+	return map[string]any{
+		"id":        p.ID,
+		"isActive":  p.IsActive,
+		"brand":     p.Brand,
+		"name":      p.Name,
+		"sku":       p.SKU,
+		"size":      p.Size,
+		"sizeUnit":  p.SizeUnit,
+		"packOf":    p.PackOf,
+		"hazardous": p.Hazardous,
+		"category":  p.Category,
+		"price":     p.Price,
+		"desc":      p.Desc,
+		"slug":      p.Slug,
+		"nameKey":   p.NameKey,
+		"quantity":  p.Quantity,
+		"createdAt": p.CreatedAt,
+		"updatedAt": p.UpdatedAt,
+	}
 }
 
 //Format methods

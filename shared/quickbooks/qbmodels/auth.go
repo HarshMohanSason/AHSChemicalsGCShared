@@ -3,7 +3,7 @@ package qbmodels
 import "time"
 
 type QBReponseToken struct {
-	TokenData            string    `json:"access_token" firestore:"access_token"`
+	AccessToken          string    `json:"access_token" firestore:"access_token"`
 	RefreshToken         string    `json:"refresh_token" firestore:"refresh_token"`
 	ExpiresInSec         int       `json:"expires_in" firestore:"expires_in"`
 	ObtainedAt           time.Time `json:"obtained_at" firestore:"obtained_at"`

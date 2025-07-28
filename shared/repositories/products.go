@@ -8,21 +8,21 @@ import (
 	"cloud.google.com/go/firestore"
 	firebase_shared "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/firebase"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
 )
 
 // FetchProductByIDs returns a list of firestore products from a list of ids
 //
 // Parameters:
-//  - ids []string: List of ids of the products to fetch
-//  - ctx context.Context: context for the request
+//   - ids []string: List of ids of the products to fetch
+//   - ctx context.Context: context for the request
 //
 // Returns:
-//  - []firestore_models.Product: List of products
-//  - error:
-//
+//   - []firestore_models.Product: List of products
+//   - error:
 func FetchProductByIDs(ids []string, ctx context.Context) ([]models.Product, error) {
 	var products []models.Product
-	
+
 	// Get all document references for customers collection
 	collection := firebase_shared.FirestoreClient.Collection("customers")
 	refs := make([]*firestore.DocumentRef, 0, len(ids))
@@ -48,4 +48,23 @@ func FetchProductByIDs(ids []string, ctx context.Context) ([]models.Product, err
 	}
 
 	return products, nil
+}
+
+func SyncQuickbookResponseToFirestore(qbItemsResponse *qbmodels.QBItemsResponse, ctx context.Context) error {
+	if qbItemsResponse == nil || qbItemsResponse.QueryResponse.Item == nil {
+		return nil // Nothing to sync
+	}
+
+	// Save each item to Firestore
+	bulkWriter := firebase_shared.FirestoreClient.BulkWriter(ctx)
+
+	for _, item := range qbItemsResponse.QueryResponse.Item {
+		docRef := firebase_shared.FirestoreClient.Collection("products").Doc(item.ID)
+		_, err := bulkWriter.Set(docRef, item.MapToProduct().MapToFirestore(), firestore.MergeAll) //Only update the changed values.
+		if err != nil {
+			return err
+		}
+	}
+	bulkWriter.Flush()
+	return nil
 }

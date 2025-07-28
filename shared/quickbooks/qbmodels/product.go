@@ -127,11 +127,17 @@ func (qb *QBItem) parseSlugAndNameKeyInto(product *models.Product) {
 	product.Slug = fmt.Sprintf("%s-%s", slug, qb.ID)
 }
 
-func (qb *QBItem) MapToFirestoreProduct() *models.Product {
+func (qb *QBItem) parseCategoryInto(product *models.Product) {
+	if qb.ParentRef == nil{
+		return
+	}
+	product.Category = qb.ParentRef.Name
+}
+
+func (qb *QBItem) MapToProduct() *models.Product {
 	product := &models.Product{
-		QBID:      qb.ID,
+		ID:        qb.ID,
 		IsActive:  qb.Active,
-		Category:  qb.ParentRef.Name,
 		CreatedAt: time.Now(),
 		UpdatedAt: time.Now(),
 		Hazardous: false,
@@ -141,5 +147,6 @@ func (qb *QBItem) MapToFirestoreProduct() *models.Product {
 	qb.parseNameInto(product)
 	qb.parseSKUInto(product)
 	qb.parseSlugAndNameKeyInto(product)
+	qb.parseCategoryInto(product)
 	return product
 }
