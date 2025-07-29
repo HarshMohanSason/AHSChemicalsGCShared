@@ -16,7 +16,6 @@ var (
 	QUICKBOOKS_AUTH_CALLBACK_URL        string //Redirect URL. When the first authentication via initial auth url completes, it redirects to this url
 	QUICBOOK_AUTH_CALLBACK_REDIRECT_URL string //Redirects user to a successful login page when quickbooks is authenticated
 	QUICKBOOKS_API_URL                  string //base url which contains either the debug or production api url.
-	QUICKBOOKS_SANDBOX_ID               string //sandbox id for the test company (Only used in DEV || STAGING)
 )
 
 // InitQuickBooksDebug initializes QuickBooks credentials for the **debug** environment.
@@ -30,6 +29,7 @@ var (
 //	QUICKBOOKS_DEBUG_CLIENT_ID
 //	QUICKBOOKS_DEBUG_CLIENT_SECRET
 //	QUICKBOOKS_DEBUG_AUTH_CALLBACK_URL
+//  QUICBOOK_AUTH_CALLBACK_REDIRECT_URL
 //	QUICKBOOKS_API_URL
 //
 // Logs:
@@ -42,8 +42,7 @@ func InitQuickBooksDebug() {
 	QUICKBOOKS_AUTH_CALLBACK_URL = os.Getenv("QUICKBOOKS_DEBUG_AUTH_CALLBACK_URL")
 	QUICBOOK_AUTH_CALLBACK_REDIRECT_URL = os.Getenv("QUICKBOOKS_DEBUG_AUTH_CALLBACK_REDIRECT_URL")
 	QUICKBOOKS_API_URL = os.Getenv("QUICKBOOKS_DEBUG_API_URL")
-	QUICKBOOKS_SANDBOX_ID  = os.Getenv("QUICKBOOKS_DEBUG_SANDBOX_ID")
-	if QUICKBOOKS_CLIENT_ID == "" || QUICKBOOKS_CLIENT_SECRET == "" || QUICKBOOKS_AUTH_CALLBACK_URL == "" || QUICKBOOKS_API_URL == "" || QUICKBOOKS_SANDBOX_ID == "" {
+	if QUICKBOOKS_CLIENT_ID == "" || QUICKBOOKS_CLIENT_SECRET == "" || QUICKBOOKS_AUTH_CALLBACK_URL == "" || QUICKBOOKS_API_URL == ""{
 		log.Fatalf("Error initializing QuickBooks credentials: missing required environment variables")
 	}
 	log.Println("Initialized quickbooks credentials in debug...")
@@ -84,8 +83,7 @@ func InitQuickBooksStaging(ctx context.Context) {
 		QUICKBOOKS_AUTH_CALLBACK_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_AUTH_CALLBACK_URL")
 		QUICBOOK_AUTH_CALLBACK_REDIRECT_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_AUTH_CALLBACK_REDIRECT_URL")
 		QUICKBOOKS_API_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_API_URL")
-		QUICKBOOKS_SANDBOX_ID = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_SANDBOX_ID")
-		if QUICKBOOKS_CLIENT_ID == "" || QUICKBOOKS_CLIENT_SECRET == "" || QUICKBOOKS_AUTH_CALLBACK_URL == "" || QUICKBOOKS_API_URL == "" || QUICKBOOKS_SANDBOX_ID == "" {
+		if QUICKBOOKS_CLIENT_ID == "" || QUICKBOOKS_CLIENT_SECRET == "" || QUICKBOOKS_AUTH_CALLBACK_URL == "" || QUICKBOOKS_API_URL == ""{
 			log.Fatalf("Error initializing QuickBooks credentials: missing required environment variables")
 		}
 		log.Println("QuickBooks credentials initialized for PRODUCTION environment.")

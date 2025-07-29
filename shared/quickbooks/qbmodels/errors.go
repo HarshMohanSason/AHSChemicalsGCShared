@@ -1,25 +1,27 @@
 package qbmodels
 
-type QBOAuthErrorResponse struct {
-	Error            string `json:"error"`
-	ErrorDescription string `json:"error_description"`
-}
-
-type QBFaultErrorResponse struct {
-	Fault QBFault `json:"Fault"`
-	Time  string  `json:"time,omitempty"`
+type QBErrorResponse struct {
+	Warnings           any     `json:"warnings"`
+	IntuitObject       any     `json:"intuitObject"`
+	Fault              QBFault `json:"fault"`
+	Report             any     `json:"report"`
+	QueryResponse      any     `json:"queryResponse"`
+	BatchItemResponse  any     `json:"batchItemResponse"`
+	AttachableResponse any     `json:"attachableResponse"`
+	SyncErrorResponse  any     `json:"syncErrorResponse"`
+	RequestId          string  `json:"requestId"`
+	Time               int64   `json:"time"`
+	Status             string  `json:"status"`
+	CDCResponse        any     `json:"cdcresponse"`
 }
 
 type QBFault struct {
-	ErrorList []QBError `json:"Error"`
-	Type      string    `json:"type"`
+	Error []QBError `json:"error"`
 }
 
 type QBError struct {
-	Message       string `json:"Message"`              
-	Detail        string `json:"Detail,omitempty"`     
-	Code          string `json:"code"`                 
-	Element       string `json:"element,omitempty"`    
-	Severity      string `json:"severity"`             
-	InnerErrorMsg string `json:"InnerError,omitempty"` 
+	Message string `json:"message"`
+	Detail  string `json:"detail"`
+	Code    string `json:"code"`
+	Element string `json:"element"`
 }

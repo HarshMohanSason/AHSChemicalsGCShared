@@ -12,7 +12,6 @@ type QBReponseToken struct {
 	TokenType            string    `json:"token_type" firestore:"token_type"`
 	State                string    `json:"state" firestore:"state"`
 	RealmId              string    `json:"realmId" firestore:"realmId"`
-	Scope                string    `json:"scope" firestore:"scope"`
 }
 
 func (r *QBReponseToken) IsExpired() bool {
@@ -23,6 +22,10 @@ func (r *QBReponseToken) SetObtainedAt() {
 }
 func (r *QBReponseToken) SetExpiresAt() {
 	r.ExpiresAt = time.Now().Add(time.Duration(r.ExpiresInSec) * time.Second)
+}
+func (r *QBReponseToken) IsRefreshTokenExpired() bool {
+	refreshTokenExpiry := r.ObtainedAt.Add(time.Duration(r.RefresTokenExpiresIn) * time.Second)
+	return time.Now().After(refreshTokenExpiry)
 }
 func (r *QBReponseToken) SetRealmID(realmID string) {
 	r.RealmId = realmID
@@ -41,6 +44,5 @@ func (r *QBReponseToken) ToMap() map[string]any {
 		"token_type":                 r.TokenType,
 		"state":                      r.State,
 		"realmId":                    r.RealmId,
-		"scope":                      r.Scope,
 	}
 }

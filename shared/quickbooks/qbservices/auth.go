@@ -41,7 +41,7 @@ func ExchangeTokenForAuthCode(ctx context.Context, authCode string) (*qbmodels.Q
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, ReturnQBOAuthError(err)
+		return nil, err
 	}
 
 	defer resp.Body.Close()
@@ -52,7 +52,7 @@ func ExchangeTokenForAuthCode(ctx context.Context, authCode string) (*qbmodels.Q
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("token exchange failed: %s", body)
+		return nil, ReturnErrorFromQBResp(body, "ExchangeTokenForAuthCode")
 	}
 
 	var tokenResp qbmodels.QBReponseToken
@@ -85,17 +85,17 @@ func refreshToken(ctx context.Context, refreshToken string) (*qbmodels.QBReponse
 	client := &http.Client{Timeout: 10 * time.Second}
 	resp, err := client.Do(req)
 	if err != nil {
-		return nil, ReturnQBOAuthError(err)
+		return nil, err
 	}
-	defer resp.Body.Close()
 
+	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
 	}
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("refresh token failed: %s", body)
+		return nil, ReturnErrorFromQBResp(body, "RefreshToken")
 	}
 
 	var tokenResp qbmodels.QBReponseToken
@@ -120,6 +120,10 @@ func EnsureValidAccessToken(ctx context.Context, uid string) (*qbmodels.QBRepons
 	}
 
 	if originalToken.IsExpired() {
+		//Check if refresh token is expired or not. If yes, return an error since user needs to re-login to quickbooks.
+		if originalToken.IsRefreshTokenExpired(){
+			return nil, fmt.Errorf("Quickbooks session has expired. Please login again to get a new access token.")
+		}
 		newToken, err := refreshToken(ctx, originalToken.RefreshToken)
 		if err != nil {
 			return nil, err
