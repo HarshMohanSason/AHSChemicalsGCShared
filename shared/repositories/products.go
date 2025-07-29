@@ -50,25 +50,44 @@ func FetchProductByIDs(ids []string, ctx context.Context) ([]models.Product, err
 	return products, nil
 }
 
-// SyncQuickbookProductRespToFirestore syncs quickbook product response to firestore 
+// FetchAllProductsFromFirestore fetches all products from firestore from collection ('products')
+func FetchAllProductsFromFirestore(ctx context.Context) ([]models.Product, error) {
+
+	products, err := firebase_shared.FirestoreClient.Collection("products").Where("isActive", "==", true).Documents(ctx).GetAll()
+	if err != nil {
+		return nil, err
+	}
+
+	productList := make([]models.Product, len(products))
+	for i, product := range products {
+		var item models.Product
+		if err := product.DataTo(&item); err != nil {
+			return nil, fmt.Errorf("error decoding product %s: %v", product.Ref.ID, err)
+		}
+		productList[i] = item
+	}
+	return productList, nil
+}
+
+// SyncQuickbookProductRespToFirestore syncs quickbook product response to firestore
 // collection ('products')
 //
 // Params:
-// 	- qbItemsResponse: *qbmodels.QBItemsResponse, a mapped response from quickbooks
-// 	- ctx: context
+//   - qbItemsResponse: *qbmodels.QBItemsResponse, a mapped response from quickbooks
+//   - ctx: context
 //
 // Returns:
-//  - error: error
+//   - error: error
 func SyncQuickbookProductRespToFirestore(qbItemsResponse *qbmodels.QBItemsResponse, ctx context.Context) error {
 	if qbItemsResponse == nil || qbItemsResponse.QueryResponse.Item == nil {
-		return nil 
+		return nil
 	}
 
 	bulkWriter := firebase_shared.FirestoreClient.BulkWriter(ctx)
 
 	for _, item := range qbItemsResponse.QueryResponse.Item {
 		docRef := firebase_shared.FirestoreClient.Collection("products").Doc(item.ID)
-		_, err := bulkWriter.Set(docRef, item.MapToProduct().ToMap(), firestore.MergeAll) 
+		_, err := bulkWriter.Set(docRef, item.MapToProduct().ToMap(), firestore.MergeAll)
 		if err != nil {
 			return err
 		}

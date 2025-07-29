@@ -14,13 +14,12 @@ import (
 // based on customerID
 //
 // Params:
-// 	- customerID: string
-// 	- ctx: context
+//   - customerID: string
+//   - ctx: context
 //
 // Returns:
-//  - *firestore_models.Customer
-//  - error: error
-//
+//   - *firestore_models.Customer
+//   - error: error
 func FetchCustomerFromFirestore(id string, ctx context.Context) (*models.Customer, error) {
 
 	docSnapshot, err := firebase_shared.FirestoreClient.Collection("customers").Doc(id).Get(ctx)
@@ -35,18 +34,37 @@ func FetchCustomerFromFirestore(id string, ctx context.Context) (*models.Custome
 	return &customer, nil
 }
 
-// SyncQuickbookCustomerRespToFirestore syncs quickbook customer response to firestore 
+//Only fetches active customers from firestore collection ('customers')
+func FetchAllCustomersFromFirestore(ctx context.Context) ([]models.Customer, error) {
+
+	customers, err := firebase_shared.FirestoreClient.Collection("customers").Where("isActive", "==", true).Documents(ctx).GetAll()
+	if err != nil {
+		return nil, err
+	}
+	customersList := make([]models.Customer, len(customers))
+	for i, customer := range customers {
+		var customerObj models.Customer
+		err = customer.DataTo(&customerObj)
+		if err != nil {
+			return nil, fmt.Errorf("Error getting customer: %v", err)
+		}
+		customersList[i] = customerObj
+	}
+	return customersList, nil
+}
+
+// SyncQuickbookCustomerRespToFirestore syncs quickbook customer response to firestore
 // collection ('customers')
 //
 // Params:
-// 	- qbItemsResponse: *qbmodels.QBCustomersResponse, a mapped response from quickbooks
-// 	- ctx: context
+//   - qbItemsResponse: *qbmodels.QBCustomersResponse, a mapped response from quickbooks
+//   - ctx: context
 //
 // Returns:
-//  - error: error
+//   - error: error
 func SyncQuickbookCustomerRespToFirestore(qbItemsResponse *qbmodels.QBCustomersResponse, ctx context.Context) error {
 	if qbItemsResponse == nil || qbItemsResponse.QueryResponse.Customer == nil {
-		return nil 
+		return nil
 	}
 
 	bulkWriter := firebase_shared.FirestoreClient.BulkWriter(ctx)

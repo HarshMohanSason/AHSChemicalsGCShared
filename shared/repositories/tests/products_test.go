@@ -41,3 +41,11 @@ func TestSyncProductsToFirestore(t *testing.T) {
 		t.Error(err)
 	}
 }
+
+func TestFetchAllProductsFromFirestore(t *testing.T) {
+	products, err := repositories.FetchAllProductsFromFirestore(context.Background())
+	if err != nil {
+		t.Error(err)
+	}
+	t.Log("Length of fetched products is: ", len(products))
+}

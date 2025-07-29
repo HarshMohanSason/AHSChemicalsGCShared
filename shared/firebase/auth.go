@@ -30,10 +30,6 @@ import (
 //	}
 //	fmt.Println("User UID:", uid)
 //
-// Errors:
-//   - Returns an error if:
-//   - The Authorization header is missing, malformed, or does not follow the Bearer token format.
-//   - Token verification fails via Firebase Admin SDK.
 func GetUIDIfAuthorized(request *http.Request) (string, error) {
 	ctx := request.Context()
 
@@ -86,14 +82,6 @@ func GetUIDIfAuthorized(request *http.Request) (string, error) {
 //	}
 //	log.Println("Admin user UID:", uid)
 //
-// Usage:
-//
-//	Use this function when you want to ensure that only authenticated admin users
-//	can access or perform certain API operations.
-//
-// Related Functions:
-//   - GetUIDIfAuthorized(): Verifies the Firebase ID token and returns the UID regardless of admin claims.
-//   - IsAuthorizedAndAdmin(): Returns only an error indicating whether the request is admin or not.
 func GetUIDIfAdmin(request *http.Request) (string, error) {
 	ctx := request.Context()
 

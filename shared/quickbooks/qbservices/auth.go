@@ -63,7 +63,7 @@ func ExchangeTokenForAuthCode(ctx context.Context, authCode string) (*qbmodels.Q
 	return &tokenResp, nil
 }
 
-// refreshToken uses a valid refresh token to obtain a new access token.
+// refreshToken uses a valid refresh token to obtain a new access token. If the refresh token has expired, it will return an error.
 func refreshToken(ctx context.Context, refreshToken string) (*qbmodels.QBReponseToken, error) {
 	tokenURL := "https://oauth.platform.intuit.com/oauth2/v1/tokens/bearer"
 

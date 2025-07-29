@@ -24,7 +24,7 @@ func getSecretManagerClient(ctx context.Context) (*secretmanager.Client, error) 
 	return secretManagerClient, secretManagerErr
 }
 
-// GetSecretFromGCP retrieves the latest version of a secret from Google Cloud Secret Manager.
+// getSecretFromGCP retrieves the latest version of a secret from Google Cloud Secret Manager.
 //
 // Parameters:
 //   - secretName: The fully-qualified name of the secret version in the format:
@@ -34,7 +34,7 @@ func getSecretManagerClient(ctx context.Context) (*secretmanager.Client, error) 
 // Returns:
 //   - The secret payload as a string if retrieval is successful.
 //   - An error if any occurs during client creation or secret access.
-func GetSecretFromGCP(secretName string) (string, error) {
+func getSecretFromGCP(secretName string) (string, error) {
 	ctx := context.Background()
 
 	// Initialize the Secret Manager client.
@@ -62,7 +62,7 @@ func GetSecretFromGCP(secretName string) (string, error) {
 //Helper function to load secrets from the path
 func LoadSecretsHelper(projectID string, secretName string) string {
 	path := fmt.Sprintf("projects/%s/secrets/%s/versions/latest", projectID, secretName)
-	secret, err := GetSecretFromGCP(path)
+	secret, err := getSecretFromGCP(path)
 	if err != nil {
 		log.Fatalf("Error fetching secret %s: %v", secretName, err)
 	}
