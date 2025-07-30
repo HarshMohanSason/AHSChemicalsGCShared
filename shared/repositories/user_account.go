@@ -9,7 +9,12 @@ import (
 
 //Only adds brands and customers to firestore
 func CreateUserAccountInFirestore(userAccount *models.UserAccount, ctx context.Context) error {
-	_, err := firebase_shared.FirestoreClient.Collection("users").Doc(userAccount.ID).Set(ctx, userAccount.MapToFirestore())
+	_, err := firebase_shared.FirestoreClient.Collection("users").Doc(userAccount.UID).Set(ctx, userAccount.ToUserAccountUpdate().ToMap())
+	return err
+}
+
+func UpdateUserAccountInFirestore(userAccount *models.UserAccountUpdate, ctx context.Context) error {
+	_, err := firebase_shared.FirestoreClient.Collection("users").Doc(userAccount.UID).Set(ctx, userAccount.ToMap())
 	return err
 }
 

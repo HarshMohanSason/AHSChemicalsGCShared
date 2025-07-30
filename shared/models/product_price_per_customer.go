@@ -14,18 +14,6 @@ type ProductPricePerCustomer struct {
 	UpdatedAt   time.Time `json:"updatedAt" firsetore:"updatedAt"`
 }
 
-func CreateProductPricePerCustomer(product *Product, customerID string) *ProductPricePerCustomer {
-	return &ProductPricePerCustomer{
-		ProductName: product.Name,
-		Brand:       product.Brand,
-		ProductID:   product.ID,
-		CustomerID:  customerID,
-		Price:       product.Price,
-		CreatedAt:   time.Now(),
-		UpdatedAt:   time.Now(),
-	}
-}
-
 func (ppc *ProductPricePerCustomer) ToMap() map[string]any {
 	return map[string]any{
 		"productName": ppc.ProductName,
@@ -35,5 +23,17 @@ func (ppc *ProductPricePerCustomer) ToMap() map[string]any {
 		"price":       ppc.Price,
 		"createdAt":   ppc.CreatedAt,
 		"updatedAt":   ppc.UpdatedAt,
+	}
+}
+
+func CreateProductPricePerCustomer(product *Product, customerID string) *ProductPricePerCustomer {
+	return &ProductPricePerCustomer{
+		ProductName: product.Name,
+		Brand:       product.Brand,
+		ProductID:   product.ID,
+		CustomerID:  customerID,
+		Price:       product.Price,
+		CreatedAt:   time.Now(),
+		UpdatedAt:   time.Now(),
 	}
 }
