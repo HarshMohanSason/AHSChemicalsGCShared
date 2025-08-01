@@ -1,4 +1,4 @@
-gpackage repositories
+package repositories
 
 import (
 	"context"
