@@ -64,9 +64,9 @@ func createItemsDataForAdminEmail(order *models.Order) []map[string]any {
 	for _, item := range order.Items {
 		mappedItem := make(map[string]any)
 		mappedItem["sku"] = item.SKU
-		mappedItem["description"] = item.FormatProductDisplay()
+		mappedItem["description"] = item.GetFormattedDescription()
 		mappedItem["quantity"] = item.Quantity
-		mappedItem["price"] = item.FormatTotalPrice()
+		mappedItem["price"] = item.GetFormattedTotalPrice()
 
 		orderItems = append(orderItems, mappedItem)
 	}
@@ -88,7 +88,7 @@ func createItemsDataForUserEmail(order *models.Order) []map[string]any {
 	for _, item := range order.Items {
 		mappedItem := make(map[string]any)
 		mappedItem["sku"] = item.SKU
-		mappedItem["description"] = item.FormatProductDisplay()
+		mappedItem["description"] = item.GetFormattedDescription()
 		mappedItem["quantity"] = item.Quantity
 
 		orderItems = append(orderItems, mappedItem)
@@ -134,7 +134,7 @@ func createItemsUpdatedPriceForAdminEmail(originalOrder , updatedOrder *models.O
 	for i, item := range originalOrder.Items {
 		mappedItem := make(map[string]any)
 		mappedItem["sku"] = item.SKU
-		mappedItem["description"] = item.FormatProductDisplay()
+		mappedItem["description"] = item.GetFormattedDescription()
 		mappedItem["quantity"] = item.Quantity
 		mappedItem["previous_price"] = item.Price
 		mappedItem["updated_price"] = updatedOrder.Items[i].Price
