@@ -6,12 +6,6 @@ import (
 	"time"
 )
 
-type ItemMinimal struct {
-	ID       string  `firestore:"id"`
-	Price    float64 `firestore:"price"`
-	Quantity int     `firestore:"quantity"`
-}
-
 type Product struct {
 	ID        string    `json:"id" firestore:"id"`
 	IsActive  bool      `json:"is_active" firestore:"isActive"`
@@ -54,45 +48,81 @@ func (p *Product) ToMap() map[string]any {
 	}
 }
 
-func (p *Product) FormatProductDisplay() string {
-	return fmt.Sprintf("%s - %s %.2f %s (Pack of %d)", p.Brand, p.Name, p.Size, p.SizeUnit, p.PackOf)
-}
-
-func (p *Product) FormatUnitPrice() string {
-	return fmt.Sprintf("$%.2f", p.Price)
-}
-
-func (p *Product) FormatTotalPrice() string {
-	return fmt.Sprintf("$%.2f", p.GetTotalPrice())
-}
-
-func (p *Product) FormatQuantity() string {
-	return fmt.Sprintf("%d", p.Quantity)
-}
-
-func (p *Product) FormatIsHazardous() string {
-	if p.Hazardous {
-		return "Yes"
+func (p *Product) ToMinimalMap() map[string]any {
+	return map[string]any{
+		"id":       p.ID,
+		"quantity": p.Quantity,
+		"price":    p.Price,
 	}
-	return "No"
 }
 
-func (p *Product) FormatNetWeight() string {
-	return fmt.Sprintf("%.2f gal", p.GetCorrectWeightInGallons())
+/* Setters */
+func (p *Product) SetID(id string) {
+	p.ID = id
 }
 
-func (p *Product) FormatHazardousWeight() string {
-	if p.Hazardous {
-		return fmt.Sprintf("%.2f gal", p.GetCorrectWeightInGallons())
-	}
-	return "N/A"
+func (p *Product) SetIsActive(isActive bool) {
+	p.IsActive = isActive
 }
 
-func (p *Product) FormatNonHazardousWeight() string {
-	if !p.Hazardous {
-		return fmt.Sprintf("%.2f gal", p.GetCorrectWeightInGallons())
-	}
-	return "N/A"
+func (p *Product) SetBrand(brand string) {
+	p.Brand = brand
+}
+
+func (p *Product) SetName(name string) {
+	p.Name = name
+}
+
+func (p *Product) SetSKU(sku string) {
+	p.SKU = sku
+}
+
+func (p *Product) SetSize(size float64) {
+	p.Size = size
+}
+
+func (p *Product) SetSizeUnit(sizeUnit string) {
+	p.SizeUnit = sizeUnit
+}
+
+func (p *Product) SetPackOf(packOf int) {
+	p.PackOf = packOf
+}
+
+func (p *Product) SetHazardous(hazardous bool) {
+	p.Hazardous = hazardous
+}
+
+func (p *Product) SetCategory(category string) {
+	p.Category = category
+}
+
+func (p *Product) SetPrice(price float64) {
+	p.Price = price
+}
+
+func (p *Product) SetDesc(desc string) {
+	p.Desc = desc
+}
+
+func (p *Product) SetSlug(slug string) {
+	p.Slug = slug
+}
+
+func (p *Product) SetNameKey(nameKey string) {
+	p.NameKey = nameKey
+}
+
+func (p *Product) SetQuantity(quantity int) {
+	p.Quantity = quantity
+}
+
+func (p *Product) SetCreatedAt(createdAt time.Time) {
+	p.CreatedAt = createdAt
+}
+
+func (p *Product) SetUpdatedAt(updatedAt time.Time) {
+	p.UpdatedAt = updatedAt
 }
 
 //Calculate methods
@@ -117,4 +147,47 @@ func (p *Product) GetCorrectWeightInGallons() float64 {
 	default:
 		return p.Size * float64(p.Quantity)
 	}
+}
+
+//Format methods
+
+func (p *Product) GetFormattedDescription() string {
+	return fmt.Sprintf("%s - %s %.2f %s (Pack of %d)", p.Brand, p.Name, p.Size, p.SizeUnit, p.PackOf)
+}
+
+func (p *Product) GetFormattedUnitPrice() string {
+	return fmt.Sprintf("$%.2f", p.Price)
+}
+
+func (p *Product) GetFormattedTotalPrice() string {
+	return fmt.Sprintf("$%.2f", p.GetTotalPrice())
+}
+
+func (p *Product) GetFormattedQuantity() string {
+	return fmt.Sprintf("%d", p.Quantity)
+}
+
+func (p *Product) GetFormattedIsHazardous() string {
+	if p.Hazardous {
+		return "Yes"
+	}
+	return "No"
+}
+
+func (p *Product) GetFormattedTotalWeight() string {
+	return fmt.Sprintf("%.2f gal", p.GetCorrectWeightInGallons())
+}
+
+func (p *Product) GetFormattedTotalHazardousWeight() string {
+	if p.Hazardous {
+		return fmt.Sprintf("%.2f gal", p.GetCorrectWeightInGallons())
+	}
+	return "N/A"
+}
+
+func (p *Product) GetFormattedTotalNonHazardousWeight() string {
+	if !p.Hazardous {
+		return fmt.Sprintf("%.2f gal", p.GetCorrectWeightInGallons())
+	}
+	return "N/A"
 }
