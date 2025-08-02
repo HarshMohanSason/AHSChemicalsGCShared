@@ -14,5 +14,8 @@ const (
 	QuickBooksCreateInvoice      = "quickbooks-create-invoice"
 	QuickBooksSyncCustomers      = "quickbooks-sync-customers"
 	QuickBooksSyncProducts       = "quickbooks-sync-products"
+	QuickBooksGetCustomer        = "quickbooks-get-customer"
+	QuickBooksGetProduct         = "quickbooks-get-products"
+	QuickBooksWebHook  			 = "quickbooks-webhook"
 	SyncProductPricesPerCustomer = "sync-product-prices-per-customer"
 )
