@@ -38,7 +38,10 @@ func InitPubSubDebug(ctx context.Context) {
 
 func InitPubSubProd(ctx context.Context) {
 	shared.InitGCPOnce.Do(func() {
-		projectID, err := metadata.ProjectIDWithContext(ctx) 
+		projectID, err := metadata.ProjectIDWithContext(ctx)
+		if err != nil { 
+			log.Fatalf("No project id found for the GCP project: %v", err)
+		}
 		PUBSUB_TOPIC_ID = LoadSecretsHelper(projectID, "PUBSUB_TOPIC_ID")
 		PUBSUB_SUBSCRIPTION_ID = LoadSecretsHelper(projectID, "PUBSUB_SUBSCRIPTION_ID")
 		if PUBSUB_TOPIC_ID == "" || PUBSUB_SUBSCRIPTION_ID == "" {

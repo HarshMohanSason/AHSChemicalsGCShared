@@ -3,19 +3,18 @@ package gcp
 import (
 	"context"
 	"log"
-	"sync"
-
+	
 	"cloud.google.com/go/compute/metadata"
 	"cloud.google.com/go/logging"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 )
 
 var (
-	once      sync.Once
 	LogClient *logging.Client
 )
 
 func InitLogger(ctx context.Context) {
-	once.Do(func() {
+	shared.InitGCPOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
 			log.Fatalf("Failed to get project ID: %v", err)
