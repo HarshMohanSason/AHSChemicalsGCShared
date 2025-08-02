@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -149,4 +150,17 @@ func SaveTokenToFirestore(ctx context.Context, t *qbmodels.QBReponseToken, uid s
 
 	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, t.ToMap(), firestore.MergeAll)
 	return err
+}
+
+//Only used in webhooks since there is no way to pass the user uid when making changes in quickbooks.
+//So this fetches the uid from the first document found in the quickbooks_tokens.
+func GetTokenUIDFromFirestore(ctx context.Context) (string, error) {
+	docRefs, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Documents(ctx).GetAll()
+	if err != nil{
+		return "", err
+	}
+	if len(docRefs) == 0 {
+		return "", errors.New("No admin token for quickbooks found. Please re authenticate quickbooks")
+	}
+	return docRefs[0].Ref.ID, nil
 }
