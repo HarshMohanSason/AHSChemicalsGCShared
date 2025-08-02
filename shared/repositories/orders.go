@@ -29,7 +29,7 @@ func CreateOrderInFirestore(order *models.Order, ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-	order.ID = docRef.ID 
+	order.SetID(docRef.ID)
 	return nil
 }
 
@@ -132,7 +132,7 @@ func FetchOrderFromFirestore(orderID string, ctx context.Context) (*models.Order
 	if err := docSnapshot.DataTo(&order); err != nil {
 		return nil, err
 	}
-	order.ID = docSnapshot.Ref.ID
+	order.SetID(docSnapshot.Ref.ID)
 	return &order, nil
 }
 
@@ -163,17 +163,16 @@ func FetchDetailedOrderFromFirestore(orderID string, ctx context.Context) (*mode
 	if err := docSnapshot.DataTo(&order); err != nil { 
 		return nil, err
 	}
-
-	// Assign the customer object
+	order.SetID(docSnapshot.Ref.ID)
+	
 	customerID := docSnapshot.Data()["customerId"].(string)
 	customer, err := FetchCustomerFromFirestore(customerID, ctx)
 	if err != nil {
 		return nil, err
 	}
-
-	//Set the customer object
 	order.Customer = *customer
 
+	//Get the product map
 	productMap, err := FetchAllProductsByIDs(ctx, order.ToProductIDs())
 	if err != nil{
 		return nil, err
