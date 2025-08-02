@@ -1,5 +1,7 @@
 package qbmodels
 
+import "encoding/json"
+
 type QBWebHookResp struct {
 	EventNotifications []EventNotification `json:"eventNotifications"`
 }
@@ -14,8 +16,12 @@ type DataChangeEvent struct {
 }
 
 type Entity struct {
-	Name           string `json:"name"`            // e.g., "Customer", "Item"
-	ID             string `json:"id"`              // ID of the updated entity
-	Operation      string `json:"operation"`       // e.g., "Update", "Create", "Delete"
-	LastUpdatedUTC string `json:"lastUpdated"`     // e.g., "2025-07-30T10:45:12Z"
+	Name           string `json:"name"`         
+	ID             string `json:"id"`           
+	Operation      string `json:"operation"`   
+	LastUpdatedUTC string `json:"lastUpdated"`  
+}
+
+func (e *Entity) ToBytes() ([]byte, error){
+	return json.Marshal(e)
 }
