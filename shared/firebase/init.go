@@ -4,24 +4,25 @@ import (
 	"context"
 	"log"
 	"os"
+	"sync"
 
 	"cloud.google.com/go/compute/metadata"
 	"cloud.google.com/go/firestore"
 	firebase "firebase.google.com/go/v4"
 	"firebase.google.com/go/v4/auth"
 	"firebase.google.com/go/v4/storage"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
 	"google.golang.org/api/option"
 )
 
-//Firebase global variables initialized only once at runtime
+// Firebase global variables initialized only once at runtime
 var (
-	App             *firebase.App
-	AuthClient      *auth.Client
-	StorageClient   *storage.Client
-	FirestoreClient *firestore.Client
-	StorageBucket   string
+	App              *firebase.App
+	AuthClient       *auth.Client
+	StorageClient    *storage.Client
+	FirestoreClient  *firestore.Client
+	StorageBucket    string
+	initFirebaseOnce sync.Once
 )
 
 // InitFirebaseDebug initializes Firebase clients for the debug environment.
@@ -37,7 +38,7 @@ var (
 // Logs:
 //   - Calls log.Fatalf() and exits the application if initialization of any service fails.
 func InitFirebaseDebug(keyPath string) {
-	shared.InitFirebaseOnce.Do(func() {
+	initFirebaseOnce.Do(func() {
 		ctx := context.Background()
 		var err error
 
@@ -83,7 +84,7 @@ func InitFirebaseDebug(keyPath string) {
 // Logs:
 //   - Calls log.Fatalf() and exits the application if initialization of any service fails.
 func InitFirebaseStaging(keyPath *string) {
-	shared.InitFirebaseOnce.Do(func() {
+	initFirebaseOnce.Do(func() {
 		ctx := context.Background()
 		var err error
 
@@ -140,7 +141,7 @@ func InitFirebaseStaging(keyPath *string) {
 // Logs:
 //   - Calls log.Fatalf() and exits the application if initialization of any service fails.
 func InitFirebaseProd(keyPath *string) {
-	shared.InitFirebaseOnce.Do(func() {
+	initFirebaseOnce.Do(func() {
 		ctx := context.Background()
 		var err error
 

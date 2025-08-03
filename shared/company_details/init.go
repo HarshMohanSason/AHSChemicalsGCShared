@@ -8,9 +8,9 @@ import (
 	"encoding/json"
 	"log"
 	"os"
+	"sync"
 
 	"cloud.google.com/go/compute/metadata"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
 )
 
@@ -23,6 +23,7 @@ var (
 	COMPANY24HOURPHONE     string            // 24-hour phone number
 	EMAILINTERNALRECIPENTS map[string]string // Key-value map of internal email recipients
 	LOGOPATH               string            // Path or URL to the company logo image
+	initCompanyDetailsOnce sync.Once
 )
 
 // InitCompanyDetailsDebug initializes company configuration using environment
@@ -52,7 +53,7 @@ func InitCompanyDetailsDebug() {
 // InitCompanyDetailsStaging initializes company configuration using Google Cloud Secret Manager
 // It behaves similarly to InitCompanyDetailsProd and also logs fatal errors if any required variable is missing.
 func InitCompanyDetailsStaging(ctx context.Context) {
-	shared.InitCompanyDetails.Do(func() {
+	initCompanyDetailsOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
 			log.Fatalf("Error loading Google Cloud project ID: %v", err)
@@ -85,7 +86,7 @@ func InitCompanyDetailsStaging(ctx context.Context) {
 // It uses `gcp.LoadSecretsHelper` to fetch required secrets from GCP
 // based on the current project ID. The values are loaded only once via sync.Once.
 func InitCompanyDetailsProd(ctx context.Context) {
-	shared.InitCompanyDetails.Do(func() {
+	initCompanyDetailsOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
 			log.Fatalf("Error loading Google Cloud project ID: %v", err)
@@ -104,7 +105,7 @@ func InitCompanyDetailsProd(ctx context.Context) {
 
 		LOGOPATH = gcp.LoadSecretsHelper(projectID, "LOGOPATH")
 
-		if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" || COMPANY24HOURPHONE == ""	{
+		if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" || COMPANY24HOURPHONE == "" {
 			log.Fatal("Company details not initialized. Please check secrets.")
 		}
 

@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 	"os"
+	"sync"
 
 	"cloud.google.com/go/compute/metadata"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
 )
 
@@ -19,6 +19,7 @@ var (
 	QUICKBOOKS_WEBHOOK_VERIFY_TOKEN     string
 	QUICKBOOKS_GET_CUSTOMER_URL			string //func url
 	QUICKBOOKS_GET_PRODUCT_URL			string //func url
+	initQuickBooksOnce					sync.Once
 )
 
 // InitQuickBooksDebug initializes QuickBooks credentials for the **debug** environment.
@@ -65,7 +66,7 @@ func InitQuickBooksDebug() {
 //	Fatal errors if the project ID cannot be determined, or any of the required secrets cannot be fetched.
 //	Success message if successfully initialized
 func InitQuickBooksStaging(ctx context.Context) {
-	shared.InitQuickBooksOnce.Do(func() {
+	initQuickBooksOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
 			log.Fatalf("Error loading Google Cloud project ID: %v", err)
@@ -84,7 +85,7 @@ func InitQuickBooksStaging(ctx context.Context) {
 		if QUICKBOOKS_CLIENT_ID == "" || QUICKBOOKS_CLIENT_SECRET == "" || QUICKBOOKS_AUTH_CALLBACK_URL == "" || QUICKBOOKS_API_URL == "" || QUICKBOOKS_WEBHOOK_VERIFY_TOKEN == "" || QUICKBOOKS_GET_CUSTOMER_URL == "" || QUICKBOOKS_GET_PRODUCT_URL == ""{
 			log.Fatalf("Error initializing QuickBooks credentials: missing required environment variables")
 		}
-		log.Println("QuickBooks credentials initialized for PRODUCTION environment.")
+		log.Println("QuickBooks credentials initialized for STAGING environment.")
 	})
 }
 
@@ -105,7 +106,7 @@ func InitQuickBooksStaging(ctx context.Context) {
 //	Fatal errors if the project ID cannot be determined, or any of the required secrets cannot be fetched.
 //	Success message if successfully initialized
 func InitQuickBooksProd(ctx context.Context) {
-	shared.InitQuickBooksOnce.Do(func() {
+	initQuickBooksOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
 			log.Fatalf("Error loading Google Cloud project ID: %v", err)

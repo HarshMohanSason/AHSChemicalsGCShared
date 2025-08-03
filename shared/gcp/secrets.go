@@ -5,20 +5,21 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"sync"
 
 	secretmanager "cloud.google.com/go/secretmanager/apiv1"
 	"cloud.google.com/go/secretmanager/apiv1/secretmanagerpb"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 )
 
 var (
-	secretManagerClient *secretmanager.Client
-	secretManagerErr    error
+	secretManagerClient   *secretmanager.Client
+	secretManagerErr      error
+	initSecretManagerOnce sync.Once
 )
 
 // getSecretManagerClient initializes the Secret Manager client once.
 func getSecretManagerClient(ctx context.Context) (*secretmanager.Client, error) {
-	shared.InitGCPOnce.Do(func() {
+	initSecretManagerOnce.Do(func() {
 		secretManagerClient, secretManagerErr = secretmanager.NewClient(ctx)
 	})
 	return secretManagerClient, secretManagerErr
@@ -59,7 +60,7 @@ func getSecretFromGCP(secretName string) (string, error) {
 	return secretData, nil
 }
 
-//Helper function to load secrets from the path
+// Helper function to load secrets from the path
 func LoadSecretsHelper(projectID string, secretName string) string {
 	path := fmt.Sprintf("projects/%s/secrets/%s/versions/latest", projectID, secretName)
 	secret, err := getSecretFromGCP(path)
