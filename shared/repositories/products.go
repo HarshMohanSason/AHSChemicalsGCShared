@@ -87,6 +87,27 @@ func SyncQuickbookProductRespToFirestore(qbItemsResponse *qbmodels.QBItemsRespon
 	return nil
 }
 
+// FetchProductFromFirestore fetches a single product from firestore. 
+//
+// Params:
+//   - ctx: context
+//   - productID: string, product id
+//
+// Returns:
+//   - *models.Product, error
+func FetchProductFromFirestore(ctx context.Context, productID string) (*models.Product, error) {
+	doc, err := firebase_shared.FirestoreClient.Collection("products").Doc(productID).Get(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var product models.Product
+	err = doc.DataTo(&product)
+	if err != nil{
+		return nil, err
+	}
+	return &product, nil
+}
+
 //UpdateProductInFirestore updates current product document in firestore. 
 //
 // Params: 
@@ -102,7 +123,6 @@ func SyncQuickbookProductRespToFirestore(qbItemsResponse *qbmodels.QBItemsRespon
 // will create a new key with that value in document. 
 func UpdateProductInFirestore(ctx context.Context, productID string, details any) error {
 	_, err := firebase_shared.FirestoreClient.Collection("products").Doc(productID).Set(ctx, details, firestore.MergeAll)
-
 	if err != nil {
 		return err
 	}
