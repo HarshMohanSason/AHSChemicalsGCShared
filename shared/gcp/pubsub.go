@@ -35,6 +35,7 @@ func InitPubSubDebug(ctx context.Context) {
 			log.Fatalf("Failed to create PubSub client: %v", err)
 		}
 		PubSubClient = client
+		log.Println("PubSub initialized")
 	})
 }
 
@@ -54,6 +55,7 @@ func InitPubSubStaging(ctx context.Context) {
 			log.Fatalf("Failed to create PubSub client: %v", err)
 		}
 		PubSubClient = client
+		log.Println("PubSub initialized")
 	})
 }
 
@@ -73,6 +75,7 @@ func InitPubSubProd(ctx context.Context) {
 			log.Fatalf("Failed to create PubSub client: %v", err)
 		}
 		PubSubClient = client
+		log.Println("PubSub initialized")
 	})
 }
 
