@@ -123,7 +123,8 @@ func EnsureValidAccessToken(ctx context.Context, uid string) (*qbmodels.QBRepons
 	if originalToken.IsExpired() {
 		//Check if refresh token is expired or not. If yes, return an error since user needs to re-login to quickbooks.
 		if originalToken.IsRefreshTokenExpired(){
-			return nil, fmt.Errorf("Quickbooks session has expired. Please login again to get a new access token.")
+			SetEmailSentOnSessionExpInFirestore(ctx, uid, true)
+			return nil, ErrQuickBooksSessionExpired
 		}
 		newToken, err := refreshToken(ctx, originalToken.RefreshToken)
 		if err != nil {
@@ -137,6 +138,7 @@ func EnsureValidAccessToken(ctx context.Context, uid string) (*qbmodels.QBRepons
 		if err != nil {
 			return nil, err
 		}
+		SetEmailSentOnSessionExpInFirestore(ctx, uid, false)
 		return newToken, nil
 	} else {
 		return &originalToken, nil
@@ -150,6 +152,26 @@ func SaveTokenToFirestore(ctx context.Context, t *qbmodels.QBReponseToken, uid s
 
 	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Set(ctx, t.ToMap(), firestore.MergeAll)
 	return err
+}
+
+func SetEmailSentOnSessionExpInFirestore(ctx context.Context, uid string, isExpired bool) error {
+	_, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Update(ctx, []firestore.Update{{Path: "email_sent_on_session_expiry", Value: isExpired}})
+	return err
+}
+
+func IsEmailSentOnSessionExpInFirestore(ctx context.Context, uid string) bool {
+	docSnapshot, err := firebase_shared.FirestoreClient.Collection("quickbooks_tokens").Doc(uid).Get(ctx)
+	if err != nil || !docSnapshot.Exists() {
+		return false // Default to false to allow sending email
+	}
+
+	val, ok := docSnapshot.Data()["email_sent_on_session_expiry"]
+	if !ok {
+		return false
+	}
+
+	isEmailSent, ok := val.(bool)
+	return ok && isEmailSent
 }
 
 //Only used in webhooks since there is no way to pass the user uid when making changes in quickbooks.
