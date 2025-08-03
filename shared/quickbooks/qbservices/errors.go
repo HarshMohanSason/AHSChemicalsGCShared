@@ -8,6 +8,11 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/quickbooks/qbmodels"
 )
 
+// Error code to know if the quickbooks session was expired or not. Quickbooks does not allow to reauthenticate programtiically. 
+// User needs to manually re-login into quickbooks via email and password.
+// Currently used in `quickbooks-webhook-entity-processor` cloud event.
+var ErrQuickBooksSessionExpired = errors.New("quickbooks session has expired, user must re-login")
+
 func ReturnErrorFromQBResp(respBody []byte, apiName string) error {
 	var errResp qbmodels.QBErrorResponse
 	err := json.Unmarshal(respBody, &errResp)
