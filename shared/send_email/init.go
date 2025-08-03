@@ -4,14 +4,15 @@ import (
 	"context"
 	"log"
 	"os"
+	"sync"
 
 	"cloud.google.com/go/compute/metadata"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
 )
 
 var (
 	SENDGRID_API_KEY string
+	initSendGridOnce sync.Once
 )
 
 // Send grid dynamic email template IDs.
@@ -45,7 +46,7 @@ func InitSendGridDebug() {
 // Parameters:
 //   - context for the function
 func InitSendGridStaging(ctx context.Context) {
-	shared.InitSendGridOnce.Do(func() {
+	initSendGridOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
 			log.Fatalf("Error loading Google Cloud project ID: %v", err)
@@ -64,7 +65,7 @@ func InitSendGridStaging(ctx context.Context) {
 // Parameters:
 //   - context for the function
 func InitSendGridProd(ctx context.Context) {
-	shared.InitSendGridOnce.Do(func() {
+	initSendGridOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
 			log.Fatalf("Error loading Google Cloud project ID: %v", err)
