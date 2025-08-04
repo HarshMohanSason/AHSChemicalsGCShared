@@ -1,9 +1,12 @@
 package services
 
 import (
+	"context"
 	"fmt"
+	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/repositories"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
 )
 
@@ -15,7 +18,7 @@ import (
 // Returns
 //   - Delivery object containing complete order details and usable images as bytes
 //   - error if any
-func NewDelivery(deliveryInput *models.DeliveryInput) (*models.Delivery, error) {
+func NewDelivery(deliveryInput *models.DeliveryInput, ctx context.Context) (*models.Delivery, error) {
 	err := deliveryInput.Validate()
 	if err != nil {
 		return nil, err
@@ -41,11 +44,17 @@ func NewDelivery(deliveryInput *models.DeliveryInput) (*models.Delivery, error) 
 		deliveryImagesBytes = append(deliveryImagesBytes, imageBytes)
 	}
 
+	order, err := repositories.FetchDetailedOrderFromFirestore(deliveryInput.OrderID, ctx)
+	if err != nil {
+		return nil, err
+	}
+
 	return &models.Delivery{
+		Order:          order,
 		DeliveredBy:    deliveryInput.DeliveredBy,
 		ReceivedBy:     deliveryInput.ReceivedBy,
 		Signature:      signatureBytes,
 		DeliveryImages: deliveryImagesBytes,
-		DeliveredAt:    deliveryInput.DeliveredAt,
+		DeliveredAt:    time.Now(),
 	}, nil
 }

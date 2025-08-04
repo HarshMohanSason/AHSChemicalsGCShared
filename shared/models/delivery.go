@@ -7,12 +7,27 @@ import (
 )
 
 type DeliveryInput struct {
-	OrderID     string           `json:"orderId"`
-	ReceivedBy  string           `json:"receivedBy"`  //Name of the person who received the order
-	DeliveredBy string           `json:"deliveredBy"` //Name of the person who delivered the order
-	Signature   multipart.File   `json:"signature"`   //Signature of the person who received the order
-	Images      []multipart.File `json:"images"`      //Images of the product when delivered
-	DeliveredAt time.Time        `json:"deliveredAt"`
+	OrderID     string           
+	ReceivedBy  string          
+	DeliveredBy string          
+	Signature   multipart.File  
+	Images      []multipart.File      
+}
+
+func (d *DeliveryInput) SetOrderID(orderID string) {
+	d.OrderID = orderID
+}
+func (d *DeliveryInput) SetReceivedBy(receivedBy string) {
+	d.ReceivedBy = receivedBy
+}
+func (d *DeliveryInput) SetDeliveredBy(deliveredBy string) {
+	d.DeliveredBy = deliveredBy
+}
+func (d *DeliveryInput) SetSignature(signature multipart.File) {
+	d.Signature = signature
+}
+func (d *DeliveryInput) SetImages(images []multipart.File) {
+	d.Images = images
 }
 
 func (d *DeliveryInput) Validate() error {
@@ -31,17 +46,14 @@ func (d *DeliveryInput) Validate() error {
 	if len(d.Images) == 0 {
 		return errors.New("No images were found when saving delivery. At least one image required. Please retry submission again")
 	}
-	if d.DeliveredAt.IsZero() {
-		return errors.New("No date was found when saving delivery. Please retry submission again")
-	}
 	return nil
 }
 
 type Delivery struct {
-	Order         Order  
-	ReceivedBy    string 
-	DeliveredBy   string
-	Signature     []byte 
+	Order          *Order
+	ReceivedBy     string
+	DeliveredBy    string
+	Signature      []byte
 	DeliveryImages [][]byte
-	DeliveredAt   time.Time
+	DeliveredAt    time.Time
 }

@@ -172,16 +172,15 @@ func CreateOrderItemsUpdatedUserEmail(order *models.Order) *send_email.EmailMeta
 //
 // Returns:
 //   - *EmailMetaData: a pointer to the populated EmailMetaData object configured for admin notification.
-func CreateOrderDeliveredAdminEmail(order *models.Order, attachments []send_email.Attachment) *send_email.EmailMetaData {
+func CreateOrderDeliveredAdminEmail(delivery *models.Delivery) *send_email.EmailMetaData {
 	emailData := &send_email.EmailMetaData{
 		Recipients: company_details.EMAILINTERNALRECIPENTS,
 		Data: map[string]any{
-			"order_number":  order.ID,
-			"customer_name": order.Customer.Name,
-			"items":         createItemsDataForAdminEmail(order),
+			"order_number":  delivery.Order.ID,
+			"customer_name": delivery.Order.Customer.Name,
+			"items":         createItemsDataForAdminEmail(delivery.Order),
 		},
 		TemplateID:  send_email.ORDER_DELIVERED_ADMIN_TEMPLATE_ID,
-		Attachments: attachments,
 	}
 	return emailData
 }
@@ -195,17 +194,16 @@ func CreateOrderDeliveredAdminEmail(order *models.Order, attachments []send_emai
 //
 // Returns:
 //   - *EmailMetaData: a pointer to the populated EmailMetaData object configured for customer notification.
-func CreateOrderDeliveredUserEmail(order *models.Order, delivery *models.Delivery) *send_email.EmailMetaData {
+func CreateOrderDeliveredUserEmail(delivery *models.Delivery) *send_email.EmailMetaData {
 	emailData := &send_email.EmailMetaData{
-		Recipients: map[string]string{order.Customer.Email: order.Customer.Name},
+		Recipients: map[string]string{delivery.Order.Customer.Email: delivery.Order.Customer.Name},
 		Data: map[string]any{
-			"order_number": order.ID,
+			"order_number": delivery.Order.ID,
 			"received_by":  delivery.ReceivedBy,
 			"delivered_by": delivery.DeliveredBy,
 			"delivered_at": delivery.DeliveredAt.Format("January 2, 2006 at 3:04 PM"),
 		},
 		TemplateID:  send_email.ORDER_DELIVERED_USER_TEMPLATE_ID,
-		Attachments: []send_email.Attachment{},
 	}
 	return emailData
 }

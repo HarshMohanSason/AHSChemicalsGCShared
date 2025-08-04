@@ -12,3 +12,10 @@ type EmailMetaData struct {
 	TemplateID  string            `json:"template_id"` //Sendgrid dynamic template id
 	Attachments []Attachment      `json:"attachments"` //List of attachments for the email
 }
+
+func (m *EmailMetaData) AddAttachment(attachment Attachment) {
+	m.Attachments = append(m.Attachments, attachment)
+}
+func (m *EmailMetaData) AddAttachments(attachments []Attachment) {
+	m.Attachments = append(m.Attachments, attachments...)
+}
