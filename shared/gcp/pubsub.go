@@ -2,6 +2,7 @@ package gcp
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"os"
@@ -77,6 +78,29 @@ func InitPubSubProd(ctx context.Context) {
 		PubSubClient = client
 		log.Println("PubSub initialized")
 	})
+}
+
+// Represents the data payload received by a subscriber to a topic. The `Data` bytes
+// can then be accessed to decode it to the struct that the `Data` was sent initially 
+// as marshalled.
+type SubMessage struct {
+	Message struct {
+		Data        []byte            `json:"data"`        
+		MessageID   string            `json:"messageId"`
+		PublishTime string            `json:"publishTime"`
+		Attributes  map[string]string `json:"attributes"`
+	} `json:"message"`
+	Subscription string `json:"subscription"`
+}
+
+// DecodeSubMessageData decodes the message data as a T struct. Returns a pointer of
+// type T struct. Using T for future usecases.
+func DecodeSubMessageData[T any](msg *SubMessage) (*T, error) {
+	var result T
+	if err := json.Unmarshal(msg.Message.Data, &result); err != nil {
+		return nil, err
+	}
+	return &result, nil
 }
 
 func PublishMessage(ctx context.Context, data []byte) error {
