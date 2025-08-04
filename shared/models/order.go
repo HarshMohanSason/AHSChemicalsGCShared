@@ -44,6 +44,13 @@ func (o *Order) CreateCompleteOrder(correctPrices map[string]float64) {
 	o.SetUpdatedAt()
 }
 
+func (o *Order) UpdateOrderBill(){
+	o.calcSubtotal()
+	o.calcTaxAmount()
+	o.calcTotal()
+	o.SetUpdatedAt()
+}
+
 /* Setters */
 
 func (o *Order) SetID(id string) {
