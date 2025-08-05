@@ -4,6 +4,7 @@ package gcp
 import (
 	"context"
 	"log"
+	"os"
 	"sync"
 
 	"cloud.google.com/go/compute/metadata"
@@ -36,6 +37,9 @@ func CloseLogger() {
 }
 
 func LogDebug(cloudFnName string, message string) {
+	if os.Getenv("ENV") == "DEBUG"{
+		log.Printf("DEBUG: %s: %s", cloudFnName, message)
+	}
 	if LogClient == nil {
 		return
 	}
@@ -43,6 +47,9 @@ func LogDebug(cloudFnName string, message string) {
 }
 
 func LogError(cloudFnName string, message string) {
+	if os.Getenv("ENV") == "DEBUG"{
+		log.Printf("DEBUG: %s: %s", cloudFnName, message)
+	}
 	if LogClient == nil {
 		return
 	}
@@ -50,6 +57,9 @@ func LogError(cloudFnName string, message string) {
 }
 
 func LogInfo(cloudFnName string, message string) {
+	if os.Getenv("ENV") == "DEBUG"{
+		log.Printf("DEBUG: %s: %s", cloudFnName, message)
+	}
 	if LogClient == nil {
 		return
 	}
@@ -57,6 +67,9 @@ func LogInfo(cloudFnName string, message string) {
 }
 
 func LogWarning(cloudFnName string, message string) {
+	if os.Getenv("ENV") == "DEBUG"{
+		log.Printf("DEBUG: %s: %s", cloudFnName, message)
+	}
 	if LogClient == nil {
 		return
 	}
@@ -64,6 +77,9 @@ func LogWarning(cloudFnName string, message string) {
 }
 
 func LogCritical(cloudFnName string, message string) {
+	if os.Getenv("ENV") == "DEBUG"{
+		log.Printf("DEBUG: %s: %s", cloudFnName, message)
+	}	
 	if LogClient == nil {
 		return
 	}
@@ -71,6 +87,9 @@ func LogCritical(cloudFnName string, message string) {
 }
 
 func LogNotice(cloudFnName string, message string) {
+	if os.Getenv("ENV") == "DEBUG"{
+		log.Printf("DEBUG: %s: %s", cloudFnName, message)
+	}	
 	if LogClient == nil {
 		return
 	}
@@ -78,6 +97,9 @@ func LogNotice(cloudFnName string, message string) {
 }
 
 func LogEmergency(cloudFnName string, message string) {
+	if os.Getenv("ENV") == "DEBUG"{
+		log.Printf("DEBUG: %s: %s", cloudFnName, message)
+	}	
 	if LogClient == nil {
 		return
 	}
@@ -85,6 +107,9 @@ func LogEmergency(cloudFnName string, message string) {
 }
 
 func LogAlert(cloudFnName string, message string) {
+	if os.Getenv("ENV") == "DEBUG"{
+		log.Printf("DEBUG: %s: %s", cloudFnName, message)
+	}	
 	if LogClient == nil {
 		return
 	}
