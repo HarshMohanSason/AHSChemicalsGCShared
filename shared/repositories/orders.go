@@ -1,3 +1,4 @@
+
 package repositories
 
 import (
@@ -179,4 +180,14 @@ func FetchDetailedOrderFromFirestore(orderID string, ctx context.Context) (*mode
 	order.ToCompleteOrderItemsFromMinimal(productMap)
 
 	return &order, nil
+}
+
+func CreateDetailedOrderFromExistingOrder(ctx context.Context, order *models.Order) error {
+	fetchedOrder, err := FetchDetailedOrderFromFirestore(order.ID, ctx)
+	if err != nil {
+		return err
+	}
+	order.Customer = fetchedOrder.Customer
+	order.ToCompleteOrderItemsFromMinimal(fetchedOrder.ToItemMap())
+	return order, nil
 }
