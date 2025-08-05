@@ -39,7 +39,7 @@ func InitPubSubDebug(ctx context.Context) {
 	})
 }
 
-func InitPubSubProdFromSecrets(ctx context.Context) {
+func InitPubSubFromSecrets(ctx context.Context) {
 	initPubSubOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {

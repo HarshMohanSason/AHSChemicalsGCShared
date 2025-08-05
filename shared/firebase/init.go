@@ -26,6 +26,9 @@ var (
 
 func InitFirebaseDebug(keyPath string) {
 	initFirebaseOnce.Do(func() {
+		if keyPath == "" {
+			log.Fatalf("KeyPath is empty. Required for initializing firebase in debug")
+		}
 		ctx := context.Background()
 		var err error
 
@@ -60,7 +63,7 @@ func InitFirebaseDebug(keyPath string) {
 //automatically initialize to the correct firebase project they have. When testing in staging 
 //environments, `admin_sdk_json` can be passed to do operations like giving admin privileges, 
 //db migrations etc.
-func InitFirebaseProdFromSecrets(keyPath *string) {
+func InitFirebaseFromSecrets(keyPath *string) {
 	initFirebaseOnce.Do(func() {
 		ctx := context.Background()
 		var err error

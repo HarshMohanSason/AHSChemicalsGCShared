@@ -44,7 +44,7 @@ func InitSendGridDebug() {
 	})
 }
 
-func InitSendGridProdFromSecrets(ctx context.Context) {
+func InitSendGridFromSecrets(ctx context.Context) {
 	initSendGridOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
 		if err != nil {
