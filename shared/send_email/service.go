@@ -2,8 +2,10 @@ package send_email
 
 import (
 	"errors"
+	"net/http"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/gcp"
 	"github.com/sendgrid/rest"
 	"github.com/sendgrid/sendgrid-go"
 	"github.com/sendgrid/sendgrid-go/helpers/mail"
@@ -56,4 +58,15 @@ func SendMail(e *EmailMetaData) (*rest.Response, error) {
 	}
 
 	return response, nil
+}
+
+func SendEmailWithLogging(email *EmailMetaData, logContext string) {
+	resp, err := SendMail(email)
+	if err != nil {
+		gcp.LogError(logContext, "Email sending failed: "+err.Error())
+		return
+	}
+	if resp.StatusCode != http.StatusAccepted {
+		gcp.LogError(logContext, "Email not accepted: "+resp.Body)
+	}
 }
