@@ -48,6 +48,7 @@ func (i *Invoice) AddLines(order *models.Order) {
 		}
 		invoiceLines = append(invoiceLines, line)
 	}
+	i.Line = invoiceLines
 }
 
 type Reference struct {
