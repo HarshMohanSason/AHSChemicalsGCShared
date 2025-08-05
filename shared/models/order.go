@@ -155,6 +155,14 @@ func (o *Order) ToCompleteOrderItemsFromMinimal(products map[string]Product) {
 	}
 }
 
+func (o *Order) ToItemMap() map[string]Product {
+	idMap := make(map[string]Product)
+	for _, item := range o.Items {
+		idMap[item.ID] = item
+	}
+	return idMap
+}
+
 /* Formatters */
 
 func (o *Order) GetFormattedTotal() string {
