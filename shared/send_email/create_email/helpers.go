@@ -49,6 +49,14 @@ func CreateAttachments(base64Contents, mimeTypes, filenames []string) []send_ema
 	return attachments
 }
 
+func CreateSingleAttachment(base64Content, mimeType, filename string) send_email.Attachment {
+	return send_email.Attachment{
+		Base64Content: base64Content,
+		MimeType:      mimeType,
+		FileName:      filename,
+	}
+}
+
 // createItemsDataForAdminEmail returns a slice of maps containing item details
 // formatted for admin emails. Each item includes the SKU, a detailed description,
 // quantity, and total price (unit price * quantity). This data is used to render the 
@@ -69,6 +77,19 @@ func createItemsDataForAdminEmail(order *models.Order) []map[string]any {
 		mappedItem["price"] = item.GetFormattedTotalPrice()
 
 		orderItems = append(orderItems, mappedItem)
+	}
+	return orderItems
+}
+
+func createItemsDetailedItemsDataForAdminEmail(order *models.Order) []map[string]any{
+	orderItems := make([]map[string]any, 0)
+	for _, item := range order.Items {
+		mappedItem := make(map[string]any)
+		mappedItem["sku"] = item.SKU
+		mappedItem["description"] = item.GetFormattedDescription()
+		mappedItem["quantity"] = item.Quantity
+		mappedItem["unit_price"] = item.GetFormattedUnitPrice()
+		mappedItem["total_price"] = item.GetFormattedTotalPrice()
 	}
 	return orderItems
 }
