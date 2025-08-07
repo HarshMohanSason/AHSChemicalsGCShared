@@ -141,19 +141,6 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 
 	c.DrawCompanyDetails()
 	c.IncY(5)
-	c.ResetX()
-
-	//24 Hour Contact Number
-	c.DrawLabelWithSingleLineText(&canvas.Text{
-		Content: "24 Hour Contact Number:",
-		Font:    "Helvetica",
-		X:       c.X,
-		Y:       c.Y,
-		Size:    10,
-		Color:   canvas.Black,
-		Style:   "B",
-	}, company_details.COMPANY24HOURPHONE)
-	c.MoveTo(c.MarginLeft+105, c.Y)
 
 	//Delivered At Section
 	c.DrawLabelWithSingleLineText(&canvas.Text{
@@ -299,7 +286,7 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	c.DrawImageFromBytes(canvas.ImageElement{
 		X:      c.X,
 		Y:      c.Y,
-		Width:  35,
+		Width:  45,
 		Height: 0,
 		Bytes:  p.Signature,
 	})

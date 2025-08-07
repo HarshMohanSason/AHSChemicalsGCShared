@@ -13,43 +13,48 @@ import (
 )
 
 type Invoice struct {
-	Number string
-	Items  []models.Product
-	Customer *models.Customer
+	Number      string
+	Items       []models.Product
+	Customer    *models.Customer
 	TableValues [][]string
-	Total string
-	SubTotal string
-	TaxAmount string
-	TaxRate string
-	PaymentDue string
-	CreatedAt string
+	LateFee     string
+	Total       string
+	SubTotal    string
+	TaxAmount   string
+	TaxRate     string
+	PaymentDue  string
+	LateFeeDate string
+	CreatedAt   string
 }
 
 const (
-	TermsAndConditions = "Payment is due within 30 days from the invoice date (Net 30). A 10% late fee will be automatically applied to the total outstanding balance if payment is not received within 14 days after the due date. Continued non-payment may result in suspension of services and additional collection actions. By receiving this invoice, you agree to these terms."
+	TermsAndConditions = "The payment for this invoice is due within 30 days from the invoice date (Net 30). By receiving this invoice, you agree to these terms."
 )
+
 var (
-	invoiceTableHeaders = []string{"ITEM", "QUANTITY", "PRICE PER UNIT", "AMOUNT"}
+	invoiceTableHeaders   = []string{"ITEM", "QUANTITY", "PRICE PER UNIT", "AMOUNT"}
 	invoiceTableColWidths = []float64{75, 25, 40, 40}
 )
 
-func NewInvoice(order *models.Order, invoiceNumber string) *Invoice{
+func NewInvoice(order *models.Order, invoiceNumber string) *Invoice {
 	invoice := &Invoice{
-		Number: invoiceNumber,
-		Customer: &order.Customer,
-		Total: order.GetFormattedTotal(),
-		SubTotal: order.GetFormattedSubTotal(),
-		TaxAmount: order.GetFormattedTaxAmount(),
-		TaxRate: order.GetFormattedTaxRate(),
-		CreatedAt: time.Now().Format("January 2, 2006"),
-		PaymentDue: time.Now().AddDate(0, 0, 30).Format("January 2, 2006"),
+		Number:      invoiceNumber,
+		Customer:    &order.Customer,
+		LateFee:     fmt.Sprintf("$%.2f", order.Total * 0.1),
+		Total:       order.GetFormattedTotal(),
+		SubTotal:    order.GetFormattedSubTotal(),
+		TaxAmount:   order.GetFormattedTaxAmount(),
+		TaxRate:     order.GetFormattedTaxRate(),
+		CreatedAt:   time.Now().Format("January 2, 2006"),
+		PaymentDue:  time.Now().AddDate(0, 0, 30).Format("January 2, 2006"),
+		LateFeeDate: time.Now().AddDate(0, 0, 44).Format("January 2, 2006"),
 	}
 	invoice.setTableValues(order.Items)
 
 	return invoice
 }
 
-func (i *Invoice) setTableValues(items []models.Product){
+func (i *Invoice) setTableValues(items []models.Product) {
 	tableValues := make([][]string, 0)
 	for _, item := range items {
 		tableValues = append(tableValues, []string{
@@ -63,7 +68,7 @@ func (i *Invoice) setTableValues(items []models.Product){
 }
 
 func (i *Invoice) RenderToPDF() ([]byte, error) {
-	
+
 	pdf := gofpdf.New("P", "mm", "A4", "")
 	pdf.AddPage()
 
@@ -79,7 +84,7 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 		LineWidth:   0.8,
 		BorderColor: canvas.PrimaryGreen,
 	})
-	c.MoveTo(c.MarginLeft, c.MarginTop + 10)
+	c.MoveTo(c.MarginLeft, c.MarginTop+10)
 
 	//Draw the company logo on top left
 	c.DrawSingleLineText(&canvas.Text{
@@ -105,7 +110,7 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 		Width:  70,
 		Height: 0,
 	})
-	c.MoveTo(c.MarginLeft, companyDetailsEndYPos + 5)
+	c.MoveTo(c.MarginLeft, companyDetailsEndYPos+5)
 
 	c.DrawSingleLineText(&canvas.Text{
 		Content: "Bill To",
@@ -119,7 +124,7 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 	c.IncY(5)
 
 	c.DrawCustomerDetails(i.Customer)
-	c.MoveTo(140, companyDetailsEndYPos + 5)
+	c.MoveTo(135, companyDetailsEndYPos+5)
 
 	//Invoice No
 	c.DrawLabelWithSingleLineText(&canvas.Text{
@@ -155,6 +160,19 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 		Color:   canvas.Black,
 		Style:   "B",
 	}, i.PaymentDue)
+	c.IncY(5)
+
+	//Late Fee Due
+	c.DrawLabelWithSingleLineText(&canvas.Text{
+		Content: "Late Fee Date:",
+		Font:    "Helvetica",
+		X:       c.X,
+		Y:       c.Y,
+		Size:    10,
+		Color:   canvas.Black,
+		Style:   "B",
+	}, i.LateFeeDate)
+
 	c.IncY(25)
 	c.ResetX()
 
@@ -183,13 +201,34 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 		Style: "B",
 		Color: canvas.White,
 	})
-	c.MoveTo(c.MarginLeft, tableEndYPos + 5)
+	c.MoveTo(c.MarginLeft, tableEndYPos+5)
 
-	c.AddNewPageIfEnd(10,canvas.PrimaryGreen, 0.8)
+	c.AddNewPageIfEnd(10, canvas.PrimaryGreen, 0.8)
 
 	c.IncX(120)
 	c.DrawBillingDetails([]string{i.SubTotal, i.TaxAmount, i.Total}, i.TaxRate)
-	c.MoveTo(c.MarginLeft, c.Y + 5)
+	c.MoveTo(c.MarginLeft, c.Y+5)
+
+	c.DrawSingleLineText(&canvas.Text{
+		Content: "Notes",
+		Font:    "Helvetica",
+		X:       c.X,
+		Y:       c.Y,
+		Size:    10,
+		Color:   canvas.Black,
+		Style:   "B",
+	})
+	c.IncY(5)
+	c.DrawMultipleLines(&canvas.Text{
+		Content: fmt.Sprintf("A late fee of %s will be charged if the invoice is not paid within the late fee date. Continued non-payment may result in suspension of services and additional collection actions.", i.LateFee),
+		Font:    "Helvetica",
+		X:       c.X,
+		Y:       c.Y,
+		Size:    10,
+		Color:   canvas.Black,
+		Style:   "",
+	}, 100, "")
+	c.IncY(15)
 
 	c.DrawSingleLineText(&canvas.Text{
 		Content: "Terms & Conditions",
@@ -210,9 +249,9 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 		Color:   canvas.Black,
 		Style:   "",
 	}, 100, "")
-	
+
 	c.DrawFooter(fmt.Sprintf("If you have any questions or concerns about this invoice please contact us at %s", company_details.COMPANYEMAIL))
-	
+
 	//Generate the PDF
 	bytes, err := utils.GetGeneratedPDF(c.PDF)
 	return bytes, err

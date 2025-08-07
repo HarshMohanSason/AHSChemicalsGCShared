@@ -148,3 +148,6 @@ type QBInvoiceResponse struct {
 func (qb *QBInvoiceResponse) GetInvoiceID() string {
 	return qb.Invoice.ID
 }
+func (qb *QBInvoiceResponse) GetDocNumber() string {
+	return qb.Invoice.DocNumber
+}

@@ -21,7 +21,6 @@ var (
 	COMPANYPHONE           string            // Support or inquiry phone number
 	COMPANYADDRESSLINE1    string            // Primary street address
 	COMPANYADDRESSLINE2    string            // Secondary address line (e.g., Suite number)
-	COMPANY24HOURPHONE     string            // 24-hour phone number
 	EMAILINTERNALRECIPENTS map[string]string // Key-value map of internal email recipients
 	LOGOPATH               string            // Path or URL to the company logo image
 	initCompanyDetailsOnce sync.Once
@@ -35,7 +34,6 @@ func InitCompanyDetailsDebug() {
 		COMPANYEMAIL = os.Getenv("COMPANYEMAIL")
 		COMPANYADDRESSLINE1 = os.Getenv("COMPANYADDRESSLINE1")
 		COMPANYADDRESSLINE2 = os.Getenv("COMPANYADDRESSLINE2")
-		COMPANY24HOURPHONE = os.Getenv("COMPANY24HOURPHONE")
 		rawEmailRecipients := os.Getenv("EMAILINTERNALRECIPIENTS")
 		err := json.Unmarshal([]byte(rawEmailRecipients), &EMAILINTERNALRECIPENTS)
 		if err != nil {
@@ -43,7 +41,7 @@ func InitCompanyDetailsDebug() {
 		}
 		LOGOPATH = os.Getenv("LOGOPATH")
 
-		if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" || COMPANY24HOURPHONE == "" || COMPANYNAME == "" || COMPANYURL == "" {
+		if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" || COMPANYNAME == "" || COMPANYURL == "" {
 			log.Fatal("Company details not initialized. Please check environment variables.")
 		}
 
@@ -65,7 +63,6 @@ func InitCompanyDetailsFromSecrets(ctx context.Context) {
 		COMPANYEMAIL = gcp.LoadSecretsHelper(projectID, "COMPANYEMAIL")
 		COMPANYADDRESSLINE1 = gcp.LoadSecretsHelper(projectID, "COMPANYADDRESSLINE1")
 		COMPANYADDRESSLINE2 = gcp.LoadSecretsHelper(projectID, "COMPANYADDRESSLINE2")
-		COMPANY24HOURPHONE = gcp.LoadSecretsHelper(projectID, "COMPANY24HOURPHONE")
 		rawEmailRecipients := gcp.LoadSecretsHelper(projectID, "EMAILINTERNALRECIPIENTS")
 		err = json.Unmarshal([]byte(rawEmailRecipients), &EMAILINTERNALRECIPENTS)
 		if err != nil {
@@ -73,7 +70,7 @@ func InitCompanyDetailsFromSecrets(ctx context.Context) {
 		}
 		LOGOPATH = gcp.LoadSecretsHelper(projectID, "LOGOPATH")
 
-		if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" || COMPANY24HOURPHONE == "" {
+		if COMPANYPHONE == "" || COMPANYEMAIL == "" || COMPANYADDRESSLINE1 == "" || COMPANYADDRESSLINE2 == "" || LOGOPATH == "" || COMPANYNAME == "" || COMPANYURL == "" {
 			log.Fatal("Company details not initialized. Please check secrets.")
 		}
 

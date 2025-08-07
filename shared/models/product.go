@@ -180,7 +180,7 @@ func AreEqualQuantities(a, b []Product) bool {
 //Format methods
 
 func (p *Product) GetFormattedDescription() string {
-	return fmt.Sprintf("%s - %s %.2f %s (Pack of %d)", p.Brand, p.Name, p.Size, p.SizeUnit, p.PackOf)
+	return fmt.Sprintf("%s - %s %.2f %s (Pack of %d)", p.Brand, p.Name, p.Size, strings.ToLower(p.SizeUnit), p.PackOf)
 }
 
 func (p *Product) GetFormattedUnitPrice() string {
