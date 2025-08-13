@@ -7,15 +7,6 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
 )
 
-// Map of valid roles.
-var (
-	roles = map[string]struct{}{
-		constants.RoleSuperAdmin: {},
-		constants.RoleAdmin:      {},
-		constants.RoleUser:       {},
-	}
-)
-
 // UserAccount represents a new user account created by the super-admin
 type UserAccountCreate struct {
 	Name      string   `json:"name"`
@@ -24,13 +15,6 @@ type UserAccountCreate struct {
 	Customers []string `json:"customers"`
 	Brands    []string `json:"brands"`
 	Role      string   `json:"role"`
-}
-
-// GetCustomClaimsMap returns the custom claims map for the user account with the role set to true.
-func (c *UserAccountCreate) GetCustomClaimsMap() map[string]any {
-	return map[string]any{
-		c.Role: true,
-	}
 }
 
 func (c *UserAccountCreate) ToFirestoreMap() map[string]any {
@@ -70,7 +54,7 @@ func (c *UserAccountCreate) Validate() error {
 	if c.Role == "" {
 		return errors.New("Role of the user cannot be empty")
 	}
-	if _, ok := roles[c.Role]; !ok {
+	if _, ok := constants.Roles[c.Role]; !ok {
 		return errors.New("Role of the user is not valid")
 	}
 	return nil
