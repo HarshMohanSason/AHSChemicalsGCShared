@@ -7,23 +7,24 @@ import (
 )
 
 type Product struct {
-	ID        string    `json:"id" firestore:"id"`
-	IsActive  bool      `json:"is_active" firestore:"isActive"`
-	Brand     string    `json:"brand" firestore:"brand"`
-	Name      string    `json:"name" firestore:"name"`
-	SKU       string    `json:"sku" firestore:"sku"`
-	Size      float64   `json:"size" firestore:"size"`
-	SizeUnit  string    `json:"sizeUnit" firestore:"sizeUnit"`
-	PackOf    int       `json:"packOf" firestore:"packOf"`
-	Hazardous bool      `json:"hazardous" firestore:"hazardous"`
-	Category  string    `json:"category" firestore:"category"`
-	Price     float64   `json:"price" firestore:"price"`
-	Desc      string    `json:"desc" firestore:"desc"`
-	Slug      string    `json:"slug" firestore:"slug"`
-	NameKey   string    `json:"nameKey" firestore:"nameKey"`
-	Quantity  int       `json:"quantity" firestore:"quantity"`
-	CreatedAt time.Time `json:"created_at" firestore:"createdAt"`
-	UpdatedAt time.Time `json:"updated_at" firestore:"updatedAt"`
+	ID            string    `json:"id" firestore:"id"`
+	IsActive      bool      `json:"is_active" firestore:"isActive"`
+	Brand         string    `json:"brand" firestore:"brand"`
+	Name          string    `json:"name" firestore:"name"`
+	SKU           string    `json:"sku" firestore:"sku"`
+	Size          float64   `json:"size" firestore:"size"`
+	SizeUnit      string    `json:"sizeUnit" firestore:"sizeUnit"`
+	PackOf        int       `json:"packOf" firestore:"packOf"`
+	Hazardous     bool      `json:"hazardous" firestore:"hazardous"`
+	Category      string    `json:"category" firestore:"category"`
+	Price         float64   `json:"price" firestore:"price"`
+	PurchasePrice float64   `json:"purchasePrice" firestore:"purchasePrice"`
+	Desc          string    `json:"desc" firestore:"desc"`
+	Slug          string    `json:"slug" firestore:"slug"`
+	NameKey       string    `json:"nameKey" firestore:"nameKey"`
+	Quantity      int       `json:"quantity" firestore:"quantity"`
+	CreatedAt     time.Time `json:"created_at" firestore:"createdAt"`
+	UpdatedAt     time.Time `json:"updated_at" firestore:"updatedAt"`
 }
 
 func (p *Product) ToMap() map[string]any {
@@ -48,10 +49,10 @@ func (p *Product) ToMap() map[string]any {
 	}
 }
 
-//ToMinimalMap returns a minimal map of product stored in firestore. 
-//Product objects are very big and can grow in the future, making sure
-//they are stored in a minimal amount of data is important to avoid 
-//big writes to one document
+// ToMinimalMap returns a minimal map of product stored in firestore.
+// Product objects are very big and can grow in the future, making sure
+// they are stored in a minimal amount of data is important to avoid
+// big writes to one document
 func (p *Product) ToMinimalMap() map[string]any {
 	return map[string]any{
 		"id":       p.ID,
@@ -134,7 +135,12 @@ func (p *Product) SetUpdatedAt(updatedAt time.Time) {
 func (p *Product) GetTotalPrice() float64 {
 	return p.Price * float64(p.Quantity)
 }
-
+func (p *Product) GetTotalPurchasePrice() float64 {
+	return p.PurchasePrice * float64(p.Quantity)
+}
+func (p *Product) GetTotalRevenue() float64 {
+	return p.GetTotalPrice() - p.GetTotalPurchasePrice()
+}
 func (p *Product) GetCorrectWeightInGallons() float64 {
 	unit := strings.ToUpper(p.SizeUnit)
 	switch unit {
@@ -187,10 +193,19 @@ func (p *Product) GetFormattedUnitPrice() string {
 	return fmt.Sprintf("$%.2f", p.Price)
 }
 
+func (p *Product) GetFormattedPurchasePrice() string {
+	return fmt.Sprintf("$%.2f", p.PurchasePrice)
+}
+
 func (p *Product) GetFormattedTotalPrice() string {
 	return fmt.Sprintf("$%.2f", p.GetTotalPrice())
 }
-
+func (p *Product) GetFormattedTotalPurchasePrice() string {
+	return fmt.Sprintf("$%.2f", p.GetTotalPurchasePrice())
+}
+func (p *Product) GetFormattedTotalRevenue() string {
+	return fmt.Sprintf("$%.2f", p.GetTotalRevenue())
+}
 func (p *Product) GetFormattedQuantity() string {
 	return fmt.Sprintf("%d", p.Quantity)
 }
