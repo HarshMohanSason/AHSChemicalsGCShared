@@ -1,4 +1,4 @@
-package qbmodels
+cdpackage qbmodels
 
 import (
 	"fmt"
