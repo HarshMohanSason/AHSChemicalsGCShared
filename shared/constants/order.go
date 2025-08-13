@@ -4,6 +4,6 @@ const (
 	// Order statuses
 	OrderStatusPending   = "PENDING"
 	OrderStatusApproved  = "APPROVED"
-	OrderStatusRejected  = "REJECTED"
+	OrderStatusCancelled = "CANCELLED"
 	OrderStatusDelivered = "DELIVERED"
 )
