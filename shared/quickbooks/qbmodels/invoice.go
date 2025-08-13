@@ -41,7 +41,6 @@ type Invoice struct {
 }
 
 func NewInvoice(order *models.Order) *Invoice {
-
 	invoice := &Invoice{
 		CustomerRef:      Reference{Value: order.Customer.ID, Name: order.Customer.Name},
 		TxnDate:          time.Now().Format("2006-01-02"),
@@ -145,9 +144,6 @@ type QBInvoiceResponse struct {
 	Time    string  `json:"time"`
 }
 
-func (qb *QBInvoiceResponse) GetInvoiceID() string {
-	return qb.Invoice.ID
-}
 func (qb *QBInvoiceResponse) GetDocNumber() string {
 	return qb.Invoice.DocNumber
 }
