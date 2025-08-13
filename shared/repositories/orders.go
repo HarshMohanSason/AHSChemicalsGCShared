@@ -51,7 +51,7 @@ func CanPlaceOrder(orderUID string, ctx context.Context) error {
 		return err
 	}
 	if len(docs) > 0 {
-		return fmt.Errorf("There is already an order pending for your account. Please contact the admin to change the status of the order to either approved or rejected in order to place a new order")
+		return fmt.Errorf("There is already an order pending for your account. Please contact the admin to change the status of the order to either approved or Cancelled in order to place a new order")
 	}
 	return nil
 }

@@ -95,7 +95,6 @@ func SyncQuickbookCustomerRespToFirestore(qbItemsResponse *qbmodels.QBCustomersR
 // will create a new key with that value in document. 
 func UpdateCustomerInFirestore(ctx context.Context, customerID string, details any) error {
 	_, err := firebase_shared.FirestoreClient.Collection("customers").Doc(customerID).Set(ctx, details, firestore.MergeAll)
-
 	if err != nil {
 		return err
 	}
