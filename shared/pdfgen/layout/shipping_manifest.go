@@ -205,45 +205,13 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 		Color:   canvas.Black,
 		Style:   "B",
 	}, p.TotalUnits)
-	c.IncX(120)
+	c.IncX(122)
 
 	//Check if a new page needs to be created
 	c.AddNewPageIfEnd(10, canvas.PrimaryBlue, 0.8)
 
-	//Total Non Hazardous Weight
-	c.DrawLabelWithSingleLineText(&canvas.Text{
-		Content: "NON HAZARDOUS WEIGHT: ",
-		Font:    "Helvetica",
-		X:       c.X,
-		Y:       c.Y,
-		Size:    10,
-		Color:   canvas.Black,
-		Style:   "B",
-	}, p.TotalNonHazardWeight)
-	c.IncY(5)
-
-	//Total Hazardous Weight
-	c.DrawLabelWithSingleLineText(&canvas.Text{
-		Content: "HAZARDOUS WEIGHT: ",
-		Font:    "Helvetica",
-		X:       c.X,
-		Y:       c.Y,
-		Size:    10,
-		Color:   canvas.Black,
-		Style:   "B",
-	}, p.TotalHazardousWeight)
-	c.IncY(5)
-
-	//Total Net Weight
-	c.DrawLabelWithSingleLineText(&canvas.Text{
-		Content: "TOTAL WEIGHT: ",
-		Font:    "Helvetica",
-		X:       c.X,
-		Y:       c.Y,
-		Size:    10,
-		Color:   canvas.Black,
-		Style:   "B",
-	}, p.TotalWeight)
+	//Not exactly billing details but the total weight of each product. Didn't know what to call it
+	c.DrawBillingDetails([]string{"NON HAZARDOUS WEIGHT:", "HAZARDOUS WEIGHT:", "TOTAL WEIGHT:"}, []string{p.TotalNonHazardWeight, p.TotalHazardousWeight, p.TotalWeight}, true, true)
 	c.MoveTo(c.MarginLeft, c.Y+10)
 
 	//Received By
@@ -256,7 +224,7 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 		Color:   canvas.Black,
 		Style:   "B",
 	}, p.ReceivedBy)
-	c.IncX(120)
+	c.IncX(122)
 
 	//Delivered By
 	c.DrawLabelWithSingleLineText(&canvas.Text{
@@ -269,6 +237,9 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 		Style:   "B",
 	}, p.DeliveredBy)
 	c.MoveTo(c.MarginLeft, c.Y+5)
+
+	//Check if a new page needs to be created
+	c.AddNewPageIfEnd(10, canvas.PrimaryBlue, 0.8)
 
 	//Signature label
 	c.DrawSingleLineText(&canvas.Text{
@@ -286,34 +257,61 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	c.DrawImageFromBytes(canvas.ImageElement{
 		X:      c.X,
 		Y:      c.Y,
-		Width:  45,
-		Height: 0,
+		Width:  60,
+		Height: 60,
 		Bytes:  p.Signature,
 	})
+	c.IncY(70)
 
+	//Delivery images label
+	c.DrawSingleLineText(&canvas.Text{
+		Content: "DELIVERY IMAGES:",
+		Font:    "Helvetica",
+		X:       c.X,
+		Y:       c.Y,
+		Size:    10,
+		Color:   canvas.Black,
+		Style:   "B",
+	})
+	c.IncY(5)
+
+	//Small images drawn below the signature
+	for _, imageBytes := range p.DeliverImages {
+		//Delivery Images
+		c.DrawImageFromBytes(canvas.ImageElement{
+			X:      c.X,
+			Y:      c.Y,
+			Width:  30,
+			Height: 0,
+			Bytes:  imageBytes,
+		})
+		c.IncX(33)
+	}
+
+	//Footer
 	c.DrawFooter(fmt.Sprintf("If you have any questions or concerns about this shipping manifest please contact us at %s", company_details.COMPANYEMAIL))
-	
-	//Delivery Images
+
+	//Big Delivery Images drawn in each separate page
 	for _, imageBytes := range p.DeliverImages {
 		//Each image is drawn on a new page
 		c.PDF.AddPage()
 		c.MoveTo(0, 0)
 
 		var imageWidth float64
-		var imageHeight float64 
+		var imageHeight float64
 		pageWidth, pageHeight := c.PDF.GetPageSize()
 		image, _, err := image.Decode(bytes.NewReader(imageBytes))
 		if err != nil {
-			imageWidth = c.BorderWidth + c.BorderX //Page width basically 
+			imageWidth = c.BorderWidth + c.BorderX //Page width basically
 			imageHeight = 0
-		}else{
+		} else {
 			imageWidth, imageHeight = c.GetCorrectByteImageDimensions(image)
 		}
 
 		//Delivery Image
 		c.DrawImageFromBytes(canvas.ImageElement{
-			X:      (pageWidth - imageWidth)/2, //Center horizontally
-			Y:      (pageHeight - imageHeight)/2, //Center vertically
+			X:      (pageWidth - imageWidth) / 2,   //Center horizontally
+			Y:      (pageHeight - imageHeight) / 2, //Center vertically
 			Width:  imageWidth,
 			Height: imageHeight,
 			Bytes:  imageBytes,
