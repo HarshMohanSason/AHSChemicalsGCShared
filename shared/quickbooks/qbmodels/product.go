@@ -127,7 +127,7 @@ func (qb *QBItem) parseSlugAndNameKeyInto(product *models.Product) {
 }
 
 func (qb *QBItem) parseCategoryInto(product *models.Product) {
-	if qb.ParentRef == nil{
+	if qb.ParentRef == nil {
 		return
 	}
 	product.Category = qb.ParentRef.Name
@@ -135,13 +135,14 @@ func (qb *QBItem) parseCategoryInto(product *models.Product) {
 
 func (qb *QBItem) MapToProduct() *models.Product {
 	product := &models.Product{
-		ID:        qb.ID,
-		IsActive:  qb.Active,
-		CreatedAt: time.Now(),
-		UpdatedAt: time.Now(),
-		Hazardous: false,
-		Price:     qb.UnitPrice,
-		Desc:      qb.Description,
+		ID:            qb.ID,
+		IsActive:      qb.Active,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
+		Hazardous:     false,
+		Price:         qb.UnitPrice,
+		PurchasePrice: qb.PurchaseCost,
+		Desc:          qb.Description,
 	}
 	qb.parseNameInto(product)
 	qb.parseSKUInto(product)
