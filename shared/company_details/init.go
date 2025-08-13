@@ -21,7 +21,7 @@ var (
 	COMPANYPHONE           string            // Support or inquiry phone number
 	COMPANYADDRESSLINE1    string            // Primary street address
 	COMPANYADDRESSLINE2    string            // Secondary address line (e.g., Suite number)
-	EMAILINTERNALRECIPENTS map[string]string // Key-value map of internal email recipients
+	EMAILINTERNALRECIPENTS map[string]string // Key-value map of internal email recipients (super - admins only). Fetching from firebase auth is O(n), so anytime a super admin is created, add it to this map.("email": "name")
 	LOGOPATH               string            // Path or URL to the company logo image
 	initCompanyDetailsOnce sync.Once
 )
