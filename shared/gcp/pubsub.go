@@ -15,7 +15,6 @@ import (
 var (
 	PubSubClient           *pubsub.Client
 	PUBSUB_TOPIC_ID        string
-	PUBSUB_SUBSCRIPTION_ID string
 	initPubSubOnce         sync.Once
 )
 
@@ -26,8 +25,7 @@ func InitPubSubDebug(ctx context.Context) {
 			log.Fatalf("GCP_PROJECT_ID env variable not set")
 		}
 		PUBSUB_TOPIC_ID = os.Getenv("PUBSUB_TOPIC_ID")
-		PUBSUB_SUBSCRIPTION_ID = os.Getenv("PUBSUB_SUBSCRIPTION_ID")
-		if projectID == "" || PUBSUB_TOPIC_ID == "" || PUBSUB_SUBSCRIPTION_ID == "" {
+		if PUBSUB_TOPIC_ID == "" {
 			log.Fatalf("PubSub env variables not set")
 		}
 		client, err := pubsub.NewClient(ctx, projectID)
@@ -46,8 +44,7 @@ func InitPubSubFromSecrets(ctx context.Context) {
 			log.Fatalf("No project id found for the GCP project: %v", err)
 		}
 		PUBSUB_TOPIC_ID = LoadSecretsHelper(projectID, "PUBSUB_TOPIC_ID")
-		PUBSUB_SUBSCRIPTION_ID = LoadSecretsHelper(projectID, "PUBSUB_SUBSCRIPTION_ID")
-		if PUBSUB_TOPIC_ID == "" || PUBSUB_SUBSCRIPTION_ID == "" {
+		if PUBSUB_TOPIC_ID == ""{
 			log.Fatalf("PubSub env variables not set")
 		}
 		client, err := pubsub.NewClient(ctx, projectID)
