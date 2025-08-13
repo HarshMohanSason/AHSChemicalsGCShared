@@ -58,7 +58,6 @@ func CreateOrderPlacedUserEmail(order *models.Order) *send_email.EmailMetaData {
 			"special_instructions": order.SpecialInstructions,
 		},
 		TemplateID:  send_email.ORDER_PLACED_USER_TEMPLATE_ID,
-		Attachments: []send_email.Attachment{},
 	}
 	return emailData
 }
@@ -84,7 +83,6 @@ func CreateOrderStatusUpdatedAdminEmail(order *models.Order) *send_email.EmailMe
 			"items":            createItemsDataForUserEmail(order), //Only need the sku, desc and quantity for this admin email template
 		},
 		TemplateID:  send_email.ORDER_STATUS_UPDATED_ADMIN_TEMPLATE_ID,
-		Attachments: []send_email.Attachment{},
 	}
 	return emailData
 }
@@ -106,7 +104,6 @@ func CreateOrderStatusUpdatedUserEmail(order *models.Order) *send_email.EmailMet
 			"order_updated_at": order.UpdatedAt.Format("January 2, 2006 at 3:04 PM"),
 		},
 		TemplateID:  send_email.ORDER_STATUS_UPDATED_USER_TEMPLATE_ID,
-		Attachments: []send_email.Attachment{},
 	}
 	return emailData
 }
@@ -133,7 +130,6 @@ func CreateOrderItemsUpdatedAdminEmail(order *models.Order) *send_email.EmailMet
 			"items":            createItemsDataForAdminEmail(order),
 		},
 		TemplateID:  send_email.ORDER_ITEMS_UPDATED_ADMIN_TEMPLATE_ID,
-		Attachments: []send_email.Attachment{},
 	}
 	return emailData
 }
@@ -157,7 +153,6 @@ func CreateOrderItemsUpdatedUserEmail(order *models.Order) *send_email.EmailMeta
 			"items":            createItemsDataForUserEmail(order),
 		},
 		TemplateID:  send_email.ORDER_ITEMS_UPDATED_USER_TEMPLATE_ID,
-		Attachments: []send_email.Attachment{},
 	}
 	return emailData
 }

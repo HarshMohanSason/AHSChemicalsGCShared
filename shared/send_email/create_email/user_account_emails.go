@@ -5,16 +5,15 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/send_email"
 )
 
-func CreateUserAccountCreatedEmail(createdUser *models.UserAccount) *send_email.EmailMetaData {
+func CreateUserAccountCreatedEmail(createdUser *models.UserAccountCreate) *send_email.EmailMetaData {
 	emailData := &send_email.EmailMetaData{
 		Recipients: map[string]string{createdUser.Email: createdUser.Name},
 		Data: map[string]any{
-			"name": createdUser.Name,
-			"email": createdUser.Email,
+			"name":     createdUser.Name,
+			"email":    createdUser.Email,
 			"password": createdUser.Password,
 		},
 		TemplateID:  send_email.ACCOUNT_CREATED_USER_TEMPLATE_ID,
-		Attachments: []send_email.Attachment{},
 	}
 	return emailData
 }
@@ -23,11 +22,10 @@ func CreateDeleteUserAccountEmail(email, name string) *send_email.EmailMetaData 
 	emailData := &send_email.EmailMetaData{
 		Recipients: map[string]string{email: name},
 		Data: map[string]any{
-			"name": name,
+			"name":  name,
 			"email": email,
 		},
 		TemplateID:  send_email.ACCOUNT_DELETED_USER_TEMPLATE_ID,
-		Attachments: []send_email.Attachment{},
 	}
 	return emailData
 }

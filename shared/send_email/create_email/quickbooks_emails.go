@@ -14,7 +14,6 @@ func CreateQuickBooksSessionExpiredEmail(reconnectURL string) *send_email.EmailM
 			"reconnect_url": reconnectURL,
 		},
 		TemplateID:  send_email.QUICKBOOKS_SESSION_EXPIRED_TEMPLATE_ID,
-		Attachments: []send_email.Attachment{},
 	}
 	return emailData
 }
