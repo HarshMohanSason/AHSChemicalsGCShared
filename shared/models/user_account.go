@@ -3,27 +3,57 @@ package models
 import (
 	"errors"
 
+	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
 )
 
-// UserAccount represents a new user account created by the admin
-type UserAccount struct {
-	UID         string      `json:"uid"`
-	Name        string      `json:"name"`
-	PhoneNumber PhoneNumber `json:"phoneNumber"`
-	Email       string      `json:"email"`
-	Password    string      `json:"password"`
-	Customers   []string    `json:"customers" firestore:"customers"`
-	Brands      []string    `json:"brands" firestore:"brands"`
+// Map of valid roles.
+var (
+	roles = map[string]struct{}{
+		constants.RoleSuperAdmin: {},
+		constants.RoleAdmin:      {},
+		constants.RoleUser:       {},
+	}
+)
+
+// UserAccount represents a new user account created by the super-admin
+type UserAccountCreate struct {
+	Name      string   `json:"name"`
+	Email     string   `json:"email"`
+	Password  string   `json:"password"`
+	Customers []string `json:"customers"`
+	Brands    []string `json:"brands"`
+	Role      string   `json:"role"`
 }
 
-// Validate validates the user account. Email and password are validated by firebase authentication, so only the necessary fields are validated
-func (c *UserAccount) Validate() error {
+// GetCustomClaimsMap returns the custom claims map for the user account with the role set to true.
+func (c *UserAccountCreate) GetCustomClaimsMap() map[string]any {
+	return map[string]any{
+		c.Role: true,
+	}
+}
+
+func (c *UserAccountCreate) ToFirestoreMap() map[string]any {
+	return map[string]any{
+		"name":      c.Name,
+		"email":     c.Email,
+		"customers": c.Customers,
+		"brands":    c.Brands,
+		"role":      c.Role,
+	}
+}
+
+// Validate validates the basic user account details. Not doing a super strict validation here because
+// firebase auth does it.
+func (c *UserAccountCreate) Validate() error {
 	if c.Name == "" {
 		return errors.New("Name of the user cannot be empty")
 	}
-	if err := c.PhoneNumber.Validate(); err != nil {
-		return err
+	if c.Email == "" {
+		return errors.New("Email of the user cannot be empty")
+	}
+	if c.Password == "" {
+		return errors.New("Password of the user cannot be empty")
 	}
 	if len(c.Customers) == 0 {
 		return errors.New("At least one customer is required for the user")
@@ -37,46 +67,20 @@ func (c *UserAccount) Validate() error {
 	if utils.HasDuplicateStrings(c.Brands) {
 		return errors.New("Brands of the user cannot have duplicates")
 	}
-	return nil
-}
-
-func (c *UserAccount) ToUserAccountUpdate() *UserAccountUpdate {
-	return &UserAccountUpdate{
-		UID:       c.UID,
-		Brands:    c.Brands,
-		Customers: c.Customers,
+	if c.Role == "" {
+		return errors.New("Role of the user cannot be empty")
 	}
-}
-
-// UpdatedAccount represents an updated account. It represents the firestore doucument for the user more or less
-type UserAccountUpdate struct {
-	UID       string   `json:"uid"`
-	Brands    []string `json:"brands"`
-	Customers []string `json:"customers"`
-}
-
-func (u *UserAccountUpdate) Validate() error {
-	if u.UID == "" {
-		return errors.New("No uid found for the updated account")
-	}
-	if len(u.Brands) == 0 {
-		return errors.New("No brands found for the updated account")
-	}
-	if utils.HasDuplicateStrings(u.Brands) {
-		return errors.New("Duplicate brands found for the updated account")
-	}
-	if len(u.Customers) == 0 {
-		return errors.New("No customers found for the updated account")
-	}
-	if utils.HasDuplicateStrings(u.Customers) {
-		return errors.New("Duplicate customers found for the updated account")
+	if _, ok := roles[c.Role]; !ok {
+		return errors.New("Role of the user is not valid")
 	}
 	return nil
 }
 
-func (u *UserAccountUpdate) ToMap() map[string]any {
-	return map[string]any{
-		"customers": u.Customers,
-		"brands":    u.Brands,
-	}
+// Used when storing/retrieving from Firestore (no password)
+type UserAccount struct {
+	Name      string   `json:"name" firestore:"name"`
+	Email     string   `json:"email" firestore:"email"`
+	Customers []string `json:"customers" firestore:"customers"`
+	Brands    []string `json:"brands" firestore:"brands"`
+	Role      string   `json:"role" firestore:"role"`
 }
