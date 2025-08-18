@@ -107,6 +107,10 @@ func (p *Product) SetPrice(price float64) {
 	p.Price = price
 }
 
+func (p *Product) SetPurchasePrice(purchasePrice float64) {
+	p.PurchasePrice = purchasePrice
+}
+
 func (p *Product) SetDesc(desc string) {
 	p.Desc = desc
 }
