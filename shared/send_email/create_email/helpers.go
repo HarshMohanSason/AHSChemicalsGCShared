@@ -90,6 +90,8 @@ func createItemsDetailedItemsDataForAdminEmail(order *models.Order) []map[string
 		mappedItem["quantity"] = item.Quantity
 		mappedItem["unit_price"] = item.GetFormattedUnitPrice()
 		mappedItem["total_price"] = item.GetFormattedTotalPrice()
+
+		orderItems = append(orderItems, mappedItem)
 	}
 	return orderItems
 }
