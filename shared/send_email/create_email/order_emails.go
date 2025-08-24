@@ -35,7 +35,7 @@ func CreateOrderPlacedAdminEmail(order *models.Order) *send_email.EmailMetaData 
 			"total":                order.GetFormattedTotal(),
 			"special_instructions": order.SpecialInstructions,
 		},
-		TemplateID:  send_email.ORDER_PLACED_ADMIN_TEMPLATE_ID,
+		TemplateID: send_email.ORDER_PLACED_ADMIN_TEMPLATE_ID,
 	}
 	return emailData
 }
@@ -57,7 +57,7 @@ func CreateOrderPlacedUserEmail(order *models.Order) *send_email.EmailMetaData {
 			"items":                createItemsDataForUserEmail(order),
 			"special_instructions": order.SpecialInstructions,
 		},
-		TemplateID:  send_email.ORDER_PLACED_USER_TEMPLATE_ID,
+		TemplateID: send_email.ORDER_PLACED_USER_TEMPLATE_ID,
 	}
 	return emailData
 }
@@ -82,7 +82,7 @@ func CreateOrderStatusUpdatedAdminEmail(order *models.Order) *send_email.EmailMe
 			"order_total":      order.GetFormattedTotal(),
 			"items":            createItemsDataForUserEmail(order), //Only need the sku, desc and quantity for this admin email template
 		},
-		TemplateID:  send_email.ORDER_STATUS_UPDATED_ADMIN_TEMPLATE_ID,
+		TemplateID: send_email.ORDER_STATUS_UPDATED_ADMIN_TEMPLATE_ID,
 	}
 	return emailData
 }
@@ -103,7 +103,7 @@ func CreateOrderStatusUpdatedUserEmail(order *models.Order) *send_email.EmailMet
 			"order_status":     order.Status,
 			"order_updated_at": order.UpdatedAt.Format("January 2, 2006 at 3:04 PM"),
 		},
-		TemplateID:  send_email.ORDER_STATUS_UPDATED_USER_TEMPLATE_ID,
+		TemplateID: send_email.ORDER_STATUS_UPDATED_USER_TEMPLATE_ID,
 	}
 	return emailData
 }
@@ -129,7 +129,7 @@ func CreateOrderItemsUpdatedAdminEmail(order *models.Order) *send_email.EmailMet
 			"order_total":      order.GetFormattedTotal(),
 			"items":            createItemsDataForAdminEmail(order),
 		},
-		TemplateID:  send_email.ORDER_ITEMS_UPDATED_ADMIN_TEMPLATE_ID,
+		TemplateID: send_email.ORDER_ITEMS_UPDATED_ADMIN_TEMPLATE_ID,
 	}
 	return emailData
 }
@@ -147,12 +147,12 @@ func CreateOrderItemsUpdatedUserEmail(order *models.Order) *send_email.EmailMeta
 	emailData := &send_email.EmailMetaData{
 		Recipients: map[string]string{order.Customer.Email: order.Customer.Name},
 		Data: map[string]any{
-			"customer_name":    order.Customer.Name,
-			"order_number":     order.ID,
-			"order_status":     order.Status,
-			"items":            createItemsDataForUserEmail(order),
+			"customer_name": order.Customer.Name,
+			"order_number":  order.ID,
+			"order_status":  order.Status,
+			"items":         createItemsDataForUserEmail(order),
 		},
-		TemplateID:  send_email.ORDER_ITEMS_UPDATED_USER_TEMPLATE_ID,
+		TemplateID: send_email.ORDER_ITEMS_UPDATED_USER_TEMPLATE_ID,
 	}
 	return emailData
 }
@@ -173,8 +173,12 @@ func CreateOrderDeliveredAdminEmail(delivery *models.Delivery) *send_email.Email
 			"order_number":  delivery.Order.ID,
 			"customer_name": delivery.Order.Customer.Name,
 			"items":         createItemsDataForAdminEmail(delivery.Order),
+			"subtotal":      delivery.Order.GetFormattedSubTotal(),
+			"tax_rate":      delivery.Order.GetFormattedTaxRate(),
+			"tax_amount":    delivery.Order.GetFormattedTaxAmount(),
+			"total":         delivery.Order.GetFormattedTotal(),
 		},
-		TemplateID:  send_email.ORDER_DELIVERED_ADMIN_TEMPLATE_ID,
+		TemplateID: send_email.ORDER_DELIVERED_ADMIN_TEMPLATE_ID,
 	}
 	return emailData
 }
@@ -197,7 +201,7 @@ func CreateOrderDeliveredUserEmail(delivery *models.Delivery) *send_email.EmailM
 			"delivered_by": delivery.DeliveredBy,
 			"delivered_at": delivery.DeliveredAt.Format("January 2, 2006 at 3:04 PM"),
 		},
-		TemplateID:  send_email.ORDER_DELIVERED_USER_TEMPLATE_ID,
+		TemplateID: send_email.ORDER_DELIVERED_USER_TEMPLATE_ID,
 	}
 	return emailData
 }
