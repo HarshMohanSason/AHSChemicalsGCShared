@@ -195,6 +195,9 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	})
 	c.MoveTo(c.MarginLeft, tableEndYPos+5)
 
+	//Check if a new page needs to be created
+	c.AddNewPageIfEnd(10, canvas.PrimaryBlue, 0.8)
+	
 	//Total Units
 	c.DrawLabelWithSingleLineText(&canvas.Text{
 		Content: "Total Units: ",
@@ -206,9 +209,6 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 		Style:   "B",
 	}, p.TotalUnits)
 	c.IncX(122)
-
-	//Check if a new page needs to be created
-	c.AddNewPageIfEnd(10, canvas.PrimaryBlue, 0.8)
 
 	//Not exactly billing details but the total weight of each product. Didn't know what to call it
 	c.DrawBillingDetails([]string{"NON HAZARDOUS WEIGHT:", "HAZARDOUS WEIGHT:", "TOTAL WEIGHT:"}, []string{p.TotalNonHazardWeight, p.TotalHazardousWeight, p.TotalWeight}, true, true)
@@ -238,8 +238,8 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	}, p.DeliveredBy)
 	c.MoveTo(c.MarginLeft, c.Y+5)
 
-	//Check if a new page needs to be created
-	c.AddNewPageIfEnd(10, canvas.PrimaryBlue, 0.8)
+	//Check if a new page needs to be created (60px is the height of the signature image and 10px is the height of the label)
+	c.AddNewPageIfEnd(70, canvas.PrimaryBlue, 0.8)
 
 	//Signature label
 	c.DrawSingleLineText(&canvas.Text{
@@ -263,6 +263,9 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	})
 	c.IncY(70)
 
+	//Check if a new page needs to be created (30px is the height of the image and 10px is the height of the label)
+	c.AddNewPageIfEnd(40, canvas.PrimaryBlue, 0.8)
+
 	//Delivery images label
 	c.DrawSingleLineText(&canvas.Text{
 		Content: "DELIVERY IMAGES:",
@@ -282,7 +285,7 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 			X:      c.X,
 			Y:      c.Y,
 			Width:  30,
-			Height: 0,
+			Height: 30,
 			Bytes:  imageBytes,
 		})
 		c.IncX(33)

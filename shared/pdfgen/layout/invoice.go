@@ -203,7 +203,8 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 	})
 	c.MoveTo(c.MarginLeft, tableEndYPos+5)
 
-	c.AddNewPageIfEnd(10, canvas.PrimaryGreen, 0.8)
+	//Check if we need to add a new page (3 labels with a gap of 10px each, so 30px total)
+	c.AddNewPageIfEnd(30, canvas.PrimaryGreen, 0.8)
 
 	c.IncX(127)
 	c.DrawBillingDetails([]string{"SUBTOTAL", fmt.Sprintf("TAX (%s)", i.TaxRate), "TOTAL"}, []string{i.SubTotal, i.TaxAmount, i.Total}, false, false)
