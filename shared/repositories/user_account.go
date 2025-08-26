@@ -9,7 +9,7 @@ import (
 )
 
 func FetchAssignedAdminsForCustomer(ctx context.Context, customerID string) ([]*models.UserAccount, error) {
-	docSnapshots, err := firebase_shared.FirestoreClient.Collection("users").
+	docSnapshots, err := firebase_shared.FirestoreClient.Collection(constants.UsersCollection).
 		Where("role", "==", constants.RoleAdmin).
 		Where("customers", "array-contains", customerID).
 		Documents(ctx).GetAll()
