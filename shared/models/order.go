@@ -54,7 +54,6 @@ func (o *Order) UpdateOrderBill() {
 	o.getSubTotal()
 	o.getTaxAmount()
 	o.getTotal()
-	o.SetUpdatedAt(time.Now().UTC())
 }
 
 //Setters
@@ -208,6 +207,7 @@ func (o *Order) ToMap() map[string]any {
 		"status":              o.Status,
 		"createdAt":           o.CreatedAt,
 		"updatedAt":           o.UpdatedAt,
+		"timeZone":            o.TimeZone,
 	}
 }
 
