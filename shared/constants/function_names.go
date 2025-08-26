@@ -16,5 +16,5 @@ const (
 	QuickBooksGetProduct             = "quickbooks-get-product"
 	QuickBooksWebHook                = "quickbooks-webhook"
 	QuickbooksWebHookEntityProcessor = "quickbooks-webhook-entity-processor" //Cloud events
-	SyncProductPricesPerCustomer     = "sync-product-prices-per-customer"
+	SyncProductPricesPerCustomer     = "sync-products-prices-per-customer"
 )
