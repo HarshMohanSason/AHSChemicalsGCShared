@@ -1,9 +1,11 @@
-//package models contains all the models used to represent data stored in firestore.
+// package models contains all the models used to represent data stored in firestore.
 package models
 
 import (
 	"fmt"
 	"time"
+
+	"cloud.google.com/go/firestore"
 )
 
 // Customer represents a customer refined and cleaner version of the QBCustomer struct.
@@ -39,7 +41,7 @@ func (c *Customer) ToMap() map[string]any {
 		"state":     c.State,
 		"zip":       c.Zip,
 		"country":   c.Country,
-		"createdAt": c.CreatedAt,
-		"updatedAt": c.UpdatedAt,
+		"createdAt": firestore.ServerTimestamp,
+		"updatedAt": firestore.ServerTimestamp,
 	}
 }
