@@ -6,24 +6,24 @@ import (
 	"strings"
 	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
 )
 
-// Order struct represents an order placed by a user.
 type Order struct {
-	ID                  string    `json:"id"`
-	Customer            Customer  `json:"customer" firestore:"customer"`
-	Uid                 string    `json:"uid" firestore:"uid"` // User ID of placed the order
-	SpecialInstructions string    `json:"specialInstructions" firestore:"specialInstructions"`
-	Items               []Product `json:"items" firestore:"items"`
-	TaxRate             float64   `json:"taxRate" firestore:"taxRate"`
-	TaxAmount           float64   `json:"taxAmount" firestore:"taxAmount"`
-	SubTotal            float64   `json:"subTotal" firestore:"subTotal"`
-	Total               float64   `json:"total" firestore:"total"`
-	Status              string    `json:"status" firestore:"status"`
-	CreatedAt           time.Time `json:"createdAt" firestore:"createdAt"`
-	UpdatedAt           time.Time `json:"updatedAt" firestore:"updatedAt"`
+	ID                  string     `json:"id"`
+	Customer            *Customer  `json:"customer" firestore:"customer"`
+	Uid                 string     `json:"uid" firestore:"uid"` // User ID of placed the order
+	SpecialInstructions string     `json:"specialInstructions" firestore:"specialInstructions"`
+	Items               []*Product `json:"items" firestore:"items"`
+	TaxRate             float64    `json:"taxRate" firestore:"taxRate"`
+	TaxAmount           float64    `json:"taxAmount" firestore:"taxAmount"`
+	SubTotal            float64    `json:"subTotal" firestore:"subTotal"`
+	Total               float64    `json:"total" firestore:"total"`
+	Status              string     `json:"status" firestore:"status"`
+	CreatedAt           time.Time  `json:"createdAt" firestore:"createdAt"`
+	UpdatedAt           time.Time  `json:"updatedAt" firestore:"updatedAt"`
 }
 
 // CreateCompleteOrder creates the complete order
@@ -40,21 +40,22 @@ func (o *Order) CreateCompleteOrder(correctPrices map[string]float64) {
 	o.getTaxAmount()
 	o.getTotal()
 	o.SetStatus(constants.OrderStatusPending)
-	o.setCreatedAt()
-	o.SetUpdatedAt()
 }
 
-func (o *Order) UpdateOrderBill(){
+func (o *Order) UpdateOrderBill() {
 	o.getSubTotal()
 	o.getTaxAmount()
 	o.getTotal()
-	o.SetUpdatedAt()
 }
 
 //Setters
 
 func (o *Order) SetID(id string) {
 	o.ID = id
+}
+
+func (o *Order) SetCustomer(customer *Customer) {
+	o.Customer = customer
 }
 
 func (o *Order) SetUID(uid string) {
@@ -71,20 +72,14 @@ func (o *Order) SetItemPrices(correctPrices map[string]float64) {
 	}
 }
 
-func (o *Order) setCreatedAt() {
-	o.CreatedAt = time.Now()
-}
-
-func (o *Order) SetUpdatedAt() {
-	o.UpdatedAt = time.Now()
-}
-
 //Getters
 
 func (o *Order) getSubTotal() {
+	subTotal := 0.0
 	for _, item := range o.Items {
-		o.SubTotal += item.GetTotalPrice()
+		subTotal += item.GetTotalPrice()
 	}
+	o.SubTotal = subTotal
 }
 
 func (o *Order) getTaxAmount() {
@@ -95,7 +90,7 @@ func (o *Order) getTotal() {
 	o.Total = o.SubTotal + o.TaxAmount
 }
 
-//Gets the total cost of goods with their purchase prices * quantity
+// Gets the total cost of goods with their purchase prices * quantity
 func (o *Order) GetTotalCOG() float64 {
 	totalCOG := 0.0
 	for _, item := range o.Items {
@@ -160,9 +155,9 @@ func (o *Order) GetFormattedCOG() string {
 	return fmt.Sprintf("$%.2f", o.GetTotalCOG())
 }
 
-//Subtracting from subtotal not total because total includes the tax. 
+// Subtracting from subtotal not total because total includes the tax.
 func (o *Order) GetFormattedTotalRevenue() string {
-	return fmt.Sprintf("$%.2f", o.SubTotal - o.GetTotalCOG())
+	return fmt.Sprintf("$%.2f", o.SubTotal-o.GetTotalCOG())
 }
 
 // Converts the order object to a map that can be stored in firestore.
@@ -178,8 +173,8 @@ func (o *Order) ToMap() map[string]any {
 		"subTotal":            utils.RoundToDecimals(o.SubTotal, 4),
 		"total":               utils.RoundToDecimals(o.Total, 4),
 		"status":              o.Status,
-		"createdAt":           o.CreatedAt,
-		"updatedAt":           o.UpdatedAt,
+		"createdAt":           firestore.ServerTimestamp,
+		"updatedAt":           firestore.ServerTimestamp,
 	}
 }
 
@@ -203,8 +198,14 @@ func (o *Order) ToProductIDs() []string {
 
 // This is used to convert the order items array stored in firestore to a
 // complete order object.
+//
 // Note: the products map[string]Product should be fetched from firestore which
 // contains the original products mapped with their id's.
+//
+// Important:
+// The only thing which is not set in the order is the price of the product. The
+// price for each product is always used from the items minimal map which already exists
+// in the order. Only time the price is fetched when the order is created.
 func (o *Order) ToCompleteOrderItemsFromMinimal(products map[string]Product) {
 	if products == nil {
 		return
@@ -228,16 +229,16 @@ func (o *Order) ToCompleteOrderItemsFromMinimal(products map[string]Product) {
 	}
 }
 
-//Converts the order items array to a map of ID:Product
-func (o *Order) ToItemMap() map[string]Product {
-	idMap := make(map[string]Product)
+// Converts the order items array to a map of ID:Product
+func (o *Order) ToItemMap() map[string]*Product {
+	idMap := make(map[string]*Product)
 	for _, item := range o.Items {
 		idMap[item.ID] = item
 	}
 	return idMap
 }
 
-//Tracks changes when updating a particular order
+// Tracks changes when updating a particular order
 type TrackOrderChange struct {
 	StatusChanged bool
 	ItemsChanged  bool
@@ -254,7 +255,7 @@ func (t *TrackOrderChange) SetStatusChanged(statusChanged bool) {
 	t.StatusChanged = statusChanged
 }
 
-func (t *TrackOrderChange) SetItemsChanged(new, old []Product) {
+func (t *TrackOrderChange) SetItemsChanged(new, old []*Product) {
 	if !AreEqualPrices(new, old) || !AreEqualQuantities(new, old) {
 		t.ItemsChanged = true
 	}
@@ -268,7 +269,7 @@ func (t *TrackOrderChange) IsOnlyStatusChanged() bool {
 	return t.StatusChanged && !t.ItemsChanged
 }
 
-func (t *TrackOrderChange) TrackOrderChanges(editedOrder, originalOrder *Order){
+func (t *TrackOrderChange) TrackOrderChanges(editedOrder, originalOrder *Order) {
 	if editedOrder.Status != originalOrder.Status {
 		t.SetStatusChanged(true)
 	}
