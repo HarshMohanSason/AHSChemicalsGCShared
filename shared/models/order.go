@@ -6,7 +6,6 @@ import (
 	"strings"
 	"time"
 
-	"cloud.google.com/go/firestore"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/constants"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
 )
@@ -24,6 +23,12 @@ type Order struct {
 	Status              string     `json:"status" firestore:"status"`
 	CreatedAt           time.Time  `json:"createdAt" firestore:"createdAt"`
 	UpdatedAt           time.Time  `json:"updatedAt" firestore:"updatedAt"`
+	TimeZone            string     `json:"timeZone" firestore:"timeZone"`
+}
+
+//Small struct to fetch order if only order id is passed form frontend
+type OrderIDPaylod struct {
+	OrderID string `json:"orderId"`
 }
 
 // CreateCompleteOrder creates the complete order
@@ -40,12 +45,16 @@ func (o *Order) CreateCompleteOrder(correctPrices map[string]float64) {
 	o.getTaxAmount()
 	o.getTotal()
 	o.SetStatus(constants.OrderStatusPending)
+	time := time.Now().UTC()
+	o.setCreatedAt(time)
+	o.SetUpdatedAt(time)
 }
 
 func (o *Order) UpdateOrderBill() {
 	o.getSubTotal()
 	o.getTaxAmount()
 	o.getTotal()
+	o.SetUpdatedAt(time.Now().UTC())
 }
 
 //Setters
@@ -70,6 +79,14 @@ func (o *Order) SetItemPrices(correctPrices map[string]float64) {
 	for i, item := range o.Items {
 		o.Items[i].SetPrice(correctPrices[item.ID])
 	}
+}
+
+func (o *Order) setCreatedAt(createdAt time.Time) {
+	o.CreatedAt = createdAt
+}
+
+func (o *Order) SetUpdatedAt(updatedAt time.Time) {
+	o.UpdatedAt = updatedAt
 }
 
 //Getters
@@ -160,6 +177,22 @@ func (o *Order) GetFormattedTotalRevenue() string {
 	return fmt.Sprintf("$%.2f", o.SubTotal-o.GetTotalCOG())
 }
 
+func (o *Order) GetLocalCreatedAtTime() time.Time{
+	localTime, err := utils.ConvertUTCToLocalTimeZoneWithFormat(o.CreatedAt, o.TimeZone)
+	if err != nil {
+		return o.CreatedAt
+	}
+	return localTime
+}
+
+func (o *Order) GetLocalUpdatedAtTime() time.Time{
+	localTime, err := utils.ConvertUTCToLocalTimeZoneWithFormat(o.UpdatedAt, o.TimeZone)
+	if err != nil {
+		return o.UpdatedAt
+	}
+	return localTime
+}
+
 // Converts the order object to a map that can be stored in firestore.
 func (o *Order) ToMap() map[string]any {
 	return map[string]any{
@@ -173,8 +206,8 @@ func (o *Order) ToMap() map[string]any {
 		"subTotal":            utils.RoundToDecimals(o.SubTotal, 4),
 		"total":               utils.RoundToDecimals(o.Total, 4),
 		"status":              o.Status,
-		"createdAt":           firestore.ServerTimestamp,
-		"updatedAt":           firestore.ServerTimestamp,
+		"createdAt":           o.CreatedAt,
+		"updatedAt":           o.UpdatedAt,
 	}
 }
 
