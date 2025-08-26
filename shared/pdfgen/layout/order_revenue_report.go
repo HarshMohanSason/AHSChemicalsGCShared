@@ -2,7 +2,6 @@ package layout
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
@@ -14,7 +13,7 @@ import (
 type OrderRevenueReport struct {
 	InvoiceNo   string
 	OrderNo     string
-	Items       []models.Product
+	Items       []*models.Product
 	Customer    *models.Customer
 	TableValues [][]string
 	Cash        string
@@ -36,14 +35,14 @@ func NewOrderRevenueReport(order *models.Order, invoiceNo string) *OrderRevenueR
 		InvoiceNo:  invoiceNo,
 		OrderNo:    order.ID,
 		Items:      order.Items,
-		Customer:   &order.Customer,
+		Customer:   order.Customer,
 		Cash:       order.GetFormattedTotal(),
 		COG:        order.GetFormattedCOG(),
 		TotalSales: order.GetFormattedSubTotal(),
 		SalesTax:   order.GetFormattedTaxAmount(),
 		TaxRate:    order.GetFormattedTaxRate(),
 		Revenue:    order.GetFormattedTotalRevenue(),
-		CreatedAt:  time.Now().Format("January 2, 2006"),
+		CreatedAt:  order.UpdatedAt.Format("January 2, 2006"),
 	}
 	orderRevenue.CreateTableValues(order)
 	return orderRevenue

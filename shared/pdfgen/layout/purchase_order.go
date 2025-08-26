@@ -20,7 +20,7 @@ var (
 
 type PurchaseOrder struct {
 	ID                  string
-	Customer            models.Customer
+	Customer            *models.Customer
 	SpecialInstructions string
 	TableValues         [][]string
 	TaxRate             string
@@ -45,7 +45,7 @@ func NewPurchaseOrder(o *models.Order) *PurchaseOrder {
 	return purchaseOrder
 }
 
-func (p *PurchaseOrder) getTableValues(items []models.Product) {
+func (p *PurchaseOrder) getTableValues(items []*models.Product) {
 	tableValues := make([][]string, 0)
 	for _, item := range items {
 		tableValues = append(tableValues, []string{
@@ -174,7 +174,7 @@ func (p *PurchaseOrder) RenderToPDF() ([]byte, error) {
 	}, "left")
 	c.IncY(11)
 	//Ship To Details
-	c.DrawCustomerDetails(&p.Customer)
+	c.DrawCustomerDetails(p.Customer)
 	c.IncY(5)
 	c.ResetX()
 

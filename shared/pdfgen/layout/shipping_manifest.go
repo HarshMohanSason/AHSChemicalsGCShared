@@ -22,7 +22,7 @@ var (
 type ShippingManifest struct {
 	PONumber             string
 	Customer             *models.Customer
-	Product              []models.Product
+	Product              []*models.Product
 	DeliveredBy          string
 	TotalUnits           string
 	TotalNonHazardWeight string
@@ -41,7 +41,7 @@ func NewShippingManifest(delivery *models.Delivery) *ShippingManifest {
 	}
 	shippingManifest := &ShippingManifest{
 		PONumber:             delivery.Order.ID,
-		Customer:             &delivery.Order.Customer,
+		Customer:             delivery.Order.Customer,
 		Product:              delivery.Order.Items,
 		TotalUnits:           delivery.Order.GetFormattedTotalItems(),
 		TotalNonHazardWeight: delivery.Order.GetFormattedNetNonHazardousWeight(),
@@ -57,7 +57,7 @@ func NewShippingManifest(delivery *models.Delivery) *ShippingManifest {
 	return shippingManifest
 }
 
-func (p *ShippingManifest) getTableValues(items []models.Product) {
+func (p *ShippingManifest) getTableValues(items []*models.Product) {
 	tableValues := make([][]string, 0)
 	for _, item := range items {
 		tableValues = append(tableValues, []string{
@@ -68,8 +68,8 @@ func (p *ShippingManifest) getTableValues(items []models.Product) {
 			class,
 			item.SKU,
 			item.GetFormattedTotalWeight(),
-			item.GetFormattedTotalHazardousWeight(),
 			item.GetFormattedTotalNonHazardousWeight(),
+			item.GetFormattedTotalHazardousWeight(),
 		})
 	}
 	p.TableValues = tableValues
@@ -197,7 +197,7 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 
 	//Check if a new page needs to be created
 	c.AddNewPageIfEnd(10, canvas.PrimaryBlue, 0.8)
-	
+
 	//Total Units
 	c.DrawLabelWithSingleLineText(&canvas.Text{
 		Content: "Total Units: ",
@@ -238,7 +238,7 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	}, p.DeliveredBy)
 	c.MoveTo(c.MarginLeft, c.Y+5)
 
-	//Check if a new page needs to be created (60px is the height of the signature image and 10px is the height of the label)
+	//Check if a new page needs to be created (60px is the rough estimate of the signature height and 10px is the height of the label)
 	c.AddNewPageIfEnd(70, canvas.PrimaryBlue, 0.8)
 
 	//Signature label
@@ -255,11 +255,10 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 
 	//Signature Image
 	c.DrawImageFromBytes(canvas.ImageElement{
-		X:      c.X,
-		Y:      c.Y,
-		Width:  60,
-		Height: 60,
-		Bytes:  p.Signature,
+		X:     c.X,
+		Y:     c.Y,
+		Width: 60,
+		Bytes: p.Signature,
 	})
 	c.IncY(70)
 

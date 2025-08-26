@@ -3,7 +3,6 @@ package layout
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
@@ -14,7 +13,7 @@ import (
 
 type Invoice struct {
 	Number      string
-	Items       []models.Product
+	Items       []*models.Product
 	Customer    *models.Customer
 	TableValues [][]string
 	LateFee     string
@@ -39,22 +38,22 @@ var (
 func NewInvoice(order *models.Order, invoiceNumber string) *Invoice {
 	invoice := &Invoice{
 		Number:      invoiceNumber,
-		Customer:    &order.Customer,
-		LateFee:     fmt.Sprintf("$%.2f", order.Total * 0.1),
+		Customer:    order.Customer,
+		LateFee:     fmt.Sprintf("$%.2f", order.Total*0.1),
 		Total:       order.GetFormattedTotal(),
 		SubTotal:    order.GetFormattedSubTotal(),
 		TaxAmount:   order.GetFormattedTaxAmount(),
 		TaxRate:     order.GetFormattedTaxRate(),
-		CreatedAt:   time.Now().Format("January 2, 2006"),
-		PaymentDue:  time.Now().AddDate(0, 0, 30).Format("January 2, 2006"),
-		LateFeeDate: time.Now().AddDate(0, 0, 44).Format("January 2, 2006"),
+		CreatedAt:   order.UpdatedAt.Format("January 2, 2006"),
+		PaymentDue:  order.UpdatedAt.AddDate(0, 0, 30).Format("January 2, 2006"),
+		LateFeeDate: order.UpdatedAt.AddDate(0, 0, 44).Format("January 2, 2006"),
 	}
 	invoice.setTableValues(order.Items)
 
 	return invoice
 }
 
-func (i *Invoice) setTableValues(items []models.Product) {
+func (i *Invoice) setTableValues(items []*models.Product) {
 	tableValues := make([][]string, 0)
 	for _, item := range items {
 		tableValues = append(tableValues, []string{
