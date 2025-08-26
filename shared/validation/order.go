@@ -24,6 +24,9 @@ func ValidateOrder(o *models.Order) error {
 	if o.Customer.Name == "" {
 		return errors.New("No customer name found for this order")
 	}
+	if o.TimeZone == "" {
+		return errors.New("No timezone found for this order")
+	}
 	return validateSpecialInstructions(o.SpecialInstructions)
 }
 
