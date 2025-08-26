@@ -6,7 +6,7 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
+	pdfutils "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
 	"github.com/phpdave11/gofpdf"
 )
 
@@ -42,7 +42,7 @@ func NewOrderRevenueReport(order *models.Order, invoiceNo string) *OrderRevenueR
 		SalesTax:   order.GetFormattedTaxAmount(),
 		TaxRate:    order.GetFormattedTaxRate(),
 		Revenue:    order.GetFormattedTotalRevenue(),
-		CreatedAt:  order.UpdatedAt.Format("January 2, 2006"),
+		CreatedAt:  order.GetLocalUpdatedAtTime().Format("January 2, 2006"),
 	}
 	orderRevenue.CreateTableValues(order)
 	return orderRevenue
@@ -172,7 +172,7 @@ func (orr *OrderRevenueReport) RenderToPDF() ([]byte, error) {
 			TextColor:   canvas.Black,
 			BorderColor: canvas.PrimaryGreen,
 		},
-		Width: utils.CalculateShippingTableCellWidths(orderRevenueReportTableColWidths),
+		Width: pdfutils.CalculateShippingTableCellWidths(orderRevenueReportTableColWidths),
 	}).Draw(c, &canvas.Text{
 		Font:  "Helvetica",
 		Size:  10,
@@ -186,8 +186,8 @@ func (orr *OrderRevenueReport) RenderToPDF() ([]byte, error) {
 
 	c.IncX(108)
 	c.DrawBillingDetails([]string{"CASH", "COST OF GOODS", "SALES", fmt.Sprintf("SALES TAX AMOUNT (%s)", orr.TaxRate), "TOTAL REVENUE"}, []string{orr.Cash, orr.COG, orr.TotalSales, orr.SalesTax, orr.Revenue}, false, false)
-	
+
 	//Generate the PDF
-	bytes, err := utils.GetGeneratedPDF(c.PDF)
+	bytes, err := pdfutils.GetGeneratedPDF(c.PDF)
 	return bytes, err
 }

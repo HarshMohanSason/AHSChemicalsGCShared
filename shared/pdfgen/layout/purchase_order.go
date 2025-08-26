@@ -6,7 +6,7 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
+	pdfutils "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
 	"github.com/phpdave11/gofpdf"
 )
 
@@ -39,7 +39,7 @@ func NewPurchaseOrder(o *models.Order) *PurchaseOrder {
 		TaxAmount:           o.GetFormattedTaxAmount(),
 		SubTotal:            o.GetFormattedSubTotal(),
 		Total:               o.GetFormattedTotal(),
-		CreatedAt:           o.CreatedAt.Format("January 2, 2006 at 3:04 PM"),
+		CreatedAt:           o.GetLocalUpdatedAtTime().Format("January 2, 2006 at 3:04 PM"),
 	}
 	purchaseOrder.getTableValues(o.Items)
 	return purchaseOrder
@@ -197,7 +197,7 @@ func (p *PurchaseOrder) RenderToPDF() ([]byte, error) {
 			TextColor:   canvas.Black,
 			BorderColor: canvas.PrimaryBlue,
 		},
-		Width: utils.CalculateShippingTableCellWidths(shippingTableCellWidths),
+		Width: pdfutils.CalculateShippingTableCellWidths(shippingTableCellWidths),
 	}).Draw(c, &canvas.Text{
 		Font:  "Helvetica",
 		Size:  10,
@@ -227,7 +227,7 @@ func (p *PurchaseOrder) RenderToPDF() ([]byte, error) {
 			TextColor:   canvas.Black,
 			BorderColor: canvas.PrimaryBlue,
 		},
-		Width: utils.CalculateShippingTableCellWidths(productTableCellWidths),
+		Width: pdfutils.CalculateShippingTableCellWidths(productTableCellWidths),
 	}).Draw(c, &canvas.Text{
 		Font:  "Helvetica",
 		Size:  10,
@@ -266,6 +266,6 @@ func (p *PurchaseOrder) RenderToPDF() ([]byte, error) {
 	c.DrawFooter(fmt.Sprintf("If you have any questions or concerns about this purchase order please contact us at %s", company_details.COMPANYEMAIL))
 
 	//Generate the PDF
-	bytes, err := utils.GetGeneratedPDF(c.PDF)
+	bytes, err := pdfutils.GetGeneratedPDF(c.PDF)
 	return bytes, err
 }

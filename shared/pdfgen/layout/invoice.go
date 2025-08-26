@@ -7,7 +7,7 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
+	pdfutils "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
 	"github.com/phpdave11/gofpdf"
 )
 
@@ -44,9 +44,9 @@ func NewInvoice(order *models.Order, invoiceNumber string) *Invoice {
 		SubTotal:    order.GetFormattedSubTotal(),
 		TaxAmount:   order.GetFormattedTaxAmount(),
 		TaxRate:     order.GetFormattedTaxRate(),
-		CreatedAt:   order.UpdatedAt.Format("January 2, 2006"),
-		PaymentDue:  order.UpdatedAt.AddDate(0, 0, 30).Format("January 2, 2006"),
-		LateFeeDate: order.UpdatedAt.AddDate(0, 0, 44).Format("January 2, 2006"),
+		CreatedAt:   order.GetLocalUpdatedAtTime().Format("January 2, 2006"),
+		PaymentDue:  order.GetLocalUpdatedAtTime().AddDate(0, 0, 30).Format("January 2, 2006"),
+		LateFeeDate: order.GetLocalUpdatedAtTime().AddDate(0, 0, 44).Format("January 2, 2006"),
 	}
 	invoice.setTableValues(order.Items)
 
@@ -193,7 +193,7 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 			TextColor:   canvas.Black,
 			BorderColor: canvas.PrimaryGreen,
 		},
-		Width: utils.CalculateShippingTableCellWidths(shippingTableCellWidths),
+		Width: pdfutils.CalculateShippingTableCellWidths(shippingTableCellWidths),
 	}).Draw(c, &canvas.Text{
 		Font:  "Helvetica",
 		Size:  10,
@@ -253,6 +253,6 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 	c.DrawFooter(fmt.Sprintf("If you have any questions or concerns about this invoice please contact us at %s", company_details.COMPANYEMAIL))
 
 	//Generate the PDF
-	bytes, err := utils.GetGeneratedPDF(c.PDF)
+	bytes, err := pdfutils.GetGeneratedPDF(c.PDF)
 	return bytes, err
 }

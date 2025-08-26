@@ -8,7 +8,7 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/company_details"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/canvas"
-	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
+	pdfutils "github.com/HarshMohanSason/AHSChemicalsGCShared/shared/pdfgen/utils"
 	"github.com/phpdave11/gofpdf"
 )
 
@@ -51,7 +51,7 @@ func NewShippingManifest(delivery *models.Delivery) *ShippingManifest {
 		ReceivedBy:           delivery.ReceivedBy,
 		Signature:            delivery.Signature,
 		DeliverImages:        delivery.DeliveryImages,
-		DeliveredAt:          delivery.DeliveredAt.Format("January 2, 2006 at 3:04 PM"),
+		DeliveredAt:          delivery.GetDeliveredAtLocalTime().Format("January 2, 2006 at 3:04 PM"),
 	}
 	shippingManifest.getTableValues(shippingManifest.Product)
 	return shippingManifest
@@ -321,6 +321,6 @@ func (p *ShippingManifest) RenderToPDF() ([]byte, error) {
 	}
 
 	//Generate the PDF
-	bytes, err := utils.GetGeneratedPDF(c.PDF)
+	bytes, err := pdfutils.GetGeneratedPDF(c.PDF)
 	return bytes, err
 }
