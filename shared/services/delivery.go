@@ -55,6 +55,6 @@ func NewDelivery(deliveryInput *models.DeliveryInput, ctx context.Context) (*mod
 		ReceivedBy:     deliveryInput.ReceivedBy,
 		Signature:      signatureBytes,
 		DeliveryImages: deliveryImagesBytes,
-		DeliveredAt:    time.Now(),
+		DeliveredAt:    time.Now().UTC(),
 	}, nil
 }

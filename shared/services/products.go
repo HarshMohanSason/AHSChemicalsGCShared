@@ -1,12 +1,12 @@
 package services
 
 import (
-	"time"
 
+	"cloud.google.com/go/firestore"
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 )
 
-// GetUpdatedProductDetails is similar to the GetUpdatedCustomerDetails. Returns the updated product details. 
+// GetUpdatedProductDetails is similar to the GetUpdatedCustomerDetails. Returns the updated product details.
 // Used for creating a map of what has changed when the customer is updated in quickbooks and is detected
 // by the webhook.
 func GetUpdatedProductDetails(newProduct, oldProduct *models.Product) map[string]any {
@@ -62,7 +62,7 @@ func GetUpdatedProductDetails(newProduct, oldProduct *models.Product) map[string
 	if len(changedValues) == 0 {
 		return nil
 	}
-	changedValues["updatedAt"] = time.Now()
+	changedValues["updatedAt"] = firestore.ServerTimestamp
 
 	return changedValues
 }
