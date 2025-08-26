@@ -8,6 +8,7 @@ import (
 	"mime/multipart"
 	"os"
 	"strings"
+	"time"
 )
 
 //HasDuplicateStrings checks if a slice of string contains any duplicates.
@@ -105,4 +106,12 @@ func CreateMultipartFile(path string) (multipart.File, error) {
 //Rounds to a specified number of decimal places.
 func RoundToDecimals(val float64, place float64) float64 {
 	return math.Round(val * 10*(place)) / (10*place)
+}
+
+func ConvertUTCToLocalTimeZoneWithFormat(t time.Time, timezone string) (time.Time, error) {
+    loc, err := time.LoadLocation(timezone) // e.g. "Asia/Kolkata"
+    if err != nil {
+        return time.Time{}, err
+    }
+    return t.In(loc), nil
 }
