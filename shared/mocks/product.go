@@ -6,8 +6,8 @@ import (
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/models"
 )
 
-func CreateMockProduct() models.Product {
-	return models.Product{
+func CreateMockProduct() *models.Product {
+	return &models.Product{
 		ID:            "prod-001",
 		IsActive:      true,
 		Brand:         "Acme",
@@ -29,8 +29,8 @@ func CreateMockProduct() models.Product {
 	}
 }
 
-func CreateMockProducts(val int) []models.Product {
-	products := make([]models.Product, val)
+func CreateMockProducts(val int) []*models.Product {
+	products := make([]*models.Product, val)
 	for i := range val {
 		products[i] = CreateMockProduct()
 	}
