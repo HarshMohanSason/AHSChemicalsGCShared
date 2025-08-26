@@ -200,10 +200,8 @@ func (o *Order) ToProductIDs() []string {
 // complete order object.
 //
 // Note: the products map[string]Product should be fetched from firestore which
-// contains the original products mapped with their id's.
-//
-// Important:
-// The only thing which is not set in the order is the price of the product. The
+// contains the original products mapped with their id's. In addition to this,
+// the only thing which is not set in the order is the price of the product. The
 // price for each product is always used from the items minimal map which already exists
 // in the order. Only time the price is fetched when the order is created.
 func (o *Order) ToCompleteOrderItemsFromMinimal(products map[string]Product) {
