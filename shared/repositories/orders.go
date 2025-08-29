@@ -15,8 +15,7 @@ import (
 // CreateOrderInFirestore creates a new order document in the Firestore "orders" collection.
 //
 // It takes a pointer to an Order object and a context. The function uploads the order data
-// to Firestore using FirestoreClient. An auto-generated document ID is returned by Firestore
-// and is then assigned back to the order's ID field.
+// to Firestore using FirestoreClient.
 //
 // Parameters:
 //   - order: Pointer to the Order struct containing the order details.
@@ -26,11 +25,10 @@ import (
 //   - error: Returns an error if the Firestore insertion fails; otherwise, returns nil.
 func CreateOrderInFirestore(order *models.Order, ctx context.Context) error {
 
-	docRef, _, err := firebase_shared.FirestoreClient.Collection(constants.OrdersCollection).Add(ctx, order.ToMap())
+	_, err := firebase_shared.FirestoreClient.Collection(constants.OrdersCollection).Doc(order.ID).Set(ctx, order.ToMap())
 	if err != nil {
 		return err
 	}
-	order.SetID(docRef.ID)
 	return nil
 }
 
