@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/HarshMohanSason/AHSChemicalsGCShared/shared/utils"
+	"github.com/disintegration/imaging"
 	"github.com/rwcarlsen/goexif/exif"
 )
 
@@ -94,7 +95,7 @@ func (d *Delivery) GetCorrectlyRotatedImages() [][]byte {
 		}
 
 		img = utils.FixImageOrientation(img, orientation)
-		
+		img = imaging.Clone(img) // Force 8-bit NRGBA
 		buf := new(bytes.Buffer)
 		err = png.Encode(buf, img)
 		if err != nil {
