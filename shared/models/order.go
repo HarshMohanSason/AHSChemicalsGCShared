@@ -26,7 +26,7 @@ type Order struct {
 	TimeZone            string     `json:"timeZone" firestore:"timeZone"`
 }
 
-//Small struct to fetch order if only order id is passed form frontend
+// Small struct to fetch order if only order id is passed form frontend
 type OrderIDPaylod struct {
 	OrderID string `json:"orderId"`
 }
@@ -176,7 +176,7 @@ func (o *Order) GetFormattedTotalRevenue() string {
 	return fmt.Sprintf("$%.2f", o.SubTotal-o.GetTotalCOG())
 }
 
-func (o *Order) GetLocalCreatedAtTime() time.Time{
+func (o *Order) GetLocalCreatedAtTime() time.Time {
 	localTime, err := utils.ConvertUTCToLocalTimeZoneWithFormat(o.CreatedAt, o.TimeZone)
 	if err != nil {
 		return o.CreatedAt
@@ -184,7 +184,7 @@ func (o *Order) GetLocalCreatedAtTime() time.Time{
 	return localTime
 }
 
-func (o *Order) GetLocalUpdatedAtTime() time.Time{
+func (o *Order) GetLocalUpdatedAtTime() time.Time {
 	localTime, err := utils.ConvertUTCToLocalTimeZoneWithFormat(o.UpdatedAt, o.TimeZone)
 	if err != nil {
 		return o.UpdatedAt
@@ -201,9 +201,9 @@ func (o *Order) ToMap() map[string]any {
 		"specialInstructions": o.SpecialInstructions,
 		"items":               o.ToMapItems(),
 		"taxRate":             o.TaxRate,
-		"taxAmount":           utils.RoundToDecimals(o.TaxAmount, 4),
-		"subTotal":            utils.RoundToDecimals(o.SubTotal, 4),
-		"total":               utils.RoundToDecimals(o.Total, 4),
+		"taxAmount":           o.TaxAmount,
+		"subTotal":            o.SubTotal,
+		"total":               o.Total,
 		"status":              o.Status,
 		"createdAt":           o.CreatedAt,
 		"updatedAt":           o.UpdatedAt,
