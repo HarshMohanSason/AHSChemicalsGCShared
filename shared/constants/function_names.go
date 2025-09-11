@@ -14,6 +14,7 @@ const (
 	QuickBooksSyncProducts           = "quickbooks-sync-products"
 	QuickBooksGetCustomer            = "quickbooks-get-customer"
 	QuickBooksGetProduct             = "quickbooks-get-product"
+	QuickBooksGetEstimate            = "quickbooks-get-estimate"
 	QuickBooksWebHook                = "quickbooks-webhook"
 	QuickbooksWebHookEntityProcessor = "quickbooks-webhook-entity-processor" //Cloud events
 	SyncProductPricesPerCustomer     = "sync-products-prices-per-customer"
