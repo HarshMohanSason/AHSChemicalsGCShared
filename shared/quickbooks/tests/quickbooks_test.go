@@ -40,6 +40,7 @@ func TestGetQuickbooksEstimate(t *testing.T){
 	if err != nil{
 		t.Error(err)
 	}
+	t.Logf("Order fetched from firestore: %v", order.Items[0].Name)
 	estimate, err := qbservices.GetOrderQBEstimate(order)
 	if err != nil{
 		t.Error(err)

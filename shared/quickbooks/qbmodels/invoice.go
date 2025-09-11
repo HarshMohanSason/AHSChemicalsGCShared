@@ -94,6 +94,7 @@ func (i *Line) SetSalesItemLineDetail(item *models.Product) {
 		},
 		Qty:       float64(item.Quantity),
 		UnitPrice: item.Price,
+		TaxCodeRef: &Reference{Value: "TAX"},
 	}
 	i.SalesItemLineDetail = detail
 }

@@ -6,7 +6,7 @@ import (
 )
 
 type QBEstimate struct {
-	ID             string               `json:"Id"`
+	ID             string               `json:"Id,omitempty"`
 	SyncToken      string               `json:"SyncToken,omitempty"`
 	MetaData       *quickbooks.MetaData `json:"MetaData,omitempty"`
 	CustomerRef    *Reference           `json:"CustomerRef"`
@@ -34,7 +34,7 @@ func NewQBEstimate(order *models.Order) *QBEstimate {
 }
 
 func (i *QBEstimate) AddLines(order *models.Order) {
-	invoiceLines := make([]Line, 0)
+	lines := make([]Line, 0)
 	for _, item := range order.Items {
 		line := Line{
 			DetailType:  "SalesItemLineDetail",
@@ -42,10 +42,9 @@ func (i *QBEstimate) AddLines(order *models.Order) {
 			Amount:      item.GetTotalPrice(),
 		}
 		line.SetSalesItemLineDetail(item)
-		line.SalesItemLineDetail.TaxCodeRef.Value = "TAX"
-		invoiceLines = append(invoiceLines, line)
+		lines = append(lines, line)
 	}
-	i.Line = invoiceLines
+	i.Line = lines
 }
 
 // Wrapper for the api response

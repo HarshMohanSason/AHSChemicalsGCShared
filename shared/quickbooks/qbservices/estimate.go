@@ -18,7 +18,7 @@ func GetOrderQBEstimate(order *models.Order) (estimate *qbmodels.QBEstimate, err
 	reqURL := quickbooks.QUICKBOOKS_GET_ESTIMATE_URL
 
 	newEstimate := qbmodels.NewQBEstimate(order)
-	
+
 	//Convert to JSON bytes
 	estimateJSON, err := json.Marshal(newEstimate)
 	if err != nil {
