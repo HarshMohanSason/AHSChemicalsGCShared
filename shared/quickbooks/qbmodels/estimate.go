@@ -42,8 +42,9 @@ func (qbe *QBEstimate) GetTotalTaxRate() float64 {
     for _, taxLine := range qbe.TxnTaxDetail.TaxLine {
         totalRate += taxLine.TaxLineDetail.TaxPercent
     }
-    return totalRate
+    return totalRate/100; //QB uses a percentage as the actual value.
 }
+
 func (i *QBEstimate) AddLines(order *models.Order) {
 	lines := make([]Line, 0)
 	for _, item := range order.Items {
