@@ -1,4 +1,4 @@
-//package quickbooks contains initialization of quickbook credentials and basic shared functions
+// package quickbooks contains initialization of quickbook credentials and basic shared functions
 package quickbooks
 
 import (
@@ -20,7 +20,8 @@ var (
 	QUICKBOOKS_WEBHOOK_VERIFY_TOKEN     string
 	QUICKBOOKS_GET_CUSTOMER_URL         string //func url
 	QUICKBOOKS_GET_PRODUCT_URL          string //func url
-	QUICKBOOKS_GET_ESTIMATE_URL         string //func url
+	QUICKBOOKS_CREATE_ESTIMATE_URL      string //func url
+	QUICKBOOKS_DELETE_ESTIMATE_URL      string //func url
 	initQuickBooksOnce                  sync.Once
 )
 
@@ -33,16 +34,17 @@ func InitQuickBooksDebug() {
 		QUICKBOOKS_API_URL = os.Getenv("QUICKBOOKS_DEBUG_API_URL")
 		QUICKBOOKS_GET_CUSTOMER_URL = os.Getenv("QUICKBOOKS_DEBUG_GET_CUSTOMER_URL")
 		QUICKBOOKS_GET_PRODUCT_URL = os.Getenv("QUICKBOOKS_DEBUG_GET_PRODUCT_URL")
-		QUICKBOOKS_GET_ESTIMATE_URL = os.Getenv("QUICKBOOKS_DEBUG_GET_ESTIMATE_URL")
-
-		if QUICKBOOKS_CLIENT_ID == "" || QUICKBOOKS_CLIENT_SECRET == "" || QUICKBOOKS_AUTH_CALLBACK_URL == "" || QUICKBOOKS_API_URL == "" || QUICKBOOKS_GET_CUSTOMER_URL == "" || QUICKBOOKS_GET_PRODUCT_URL == "" || QUICKBOOKS_GET_ESTIMATE_URL == "" {
+		QUICKBOOKS_CREATE_ESTIMATE_URL = os.Getenv("QUICKBOOKS_DEBUG_CREATE_ESTIMATE_URL")
+		QUICKBOOKS_DELETE_ESTIMATE_URL = os.Getenv("QUICKBOOKS_DEBUG_DELETE_ESTIMATE_URL")
+		
+		if QUICKBOOKS_CLIENT_ID == "" || QUICKBOOKS_CLIENT_SECRET == "" || QUICKBOOKS_AUTH_CALLBACK_URL == "" || QUICKBOOKS_API_URL == "" || QUICKBOOKS_GET_CUSTOMER_URL == "" || QUICKBOOKS_GET_PRODUCT_URL == "" || QUICKBOOKS_CREATE_ESTIMATE_URL == "" || QUICKBOOKS_DELETE_ESTIMATE_URL == "" {
 			log.Fatalf("Error initializing QuickBooks credentials: missing required environment variables")
 		}
 		log.Println("Initialized quickbooks credentials in debug...")
 	})
 }
 
-//For Prod and Staging
+// For Prod and Staging
 func InitQuickBooksFromSecrets(ctx context.Context) {
 	initQuickBooksOnce.Do(func() {
 		projectID, err := metadata.ProjectIDWithContext(ctx)
@@ -58,9 +60,10 @@ func InitQuickBooksFromSecrets(ctx context.Context) {
 		QUICKBOOKS_WEBHOOK_VERIFY_TOKEN = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_WEBHOOK_VERIFY_TOKEN")
 		QUICKBOOKS_GET_CUSTOMER_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_GET_CUSTOMER_URL")
 		QUICKBOOKS_GET_PRODUCT_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_GET_PRODUCT_URL")
-		QUICKBOOKS_GET_ESTIMATE_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_GET_ESTIMATE_URL")
-
-		if QUICKBOOKS_CLIENT_ID == "" || QUICKBOOKS_CLIENT_SECRET == "" || QUICKBOOKS_AUTH_CALLBACK_URL == "" || QUICKBOOKS_API_URL == "" || QUICKBOOKS_WEBHOOK_VERIFY_TOKEN == "" || QUICKBOOKS_GET_CUSTOMER_URL == "" || QUICKBOOKS_GET_PRODUCT_URL == "" || QUICKBOOKS_GET_ESTIMATE_URL == "" {
+		QUICKBOOKS_CREATE_ESTIMATE_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_CREATE_ESTIMATE_URL")
+		QUICKBOOKS_DELETE_ESTIMATE_URL = gcp.LoadSecretsHelper(projectID, "QUICKBOOKS_DELETE_ESTIMATE_URL")
+		
+		if QUICKBOOKS_CLIENT_ID == "" || QUICKBOOKS_CLIENT_SECRET == "" || QUICKBOOKS_AUTH_CALLBACK_URL == "" || QUICKBOOKS_API_URL == "" || QUICKBOOKS_WEBHOOK_VERIFY_TOKEN == "" || QUICKBOOKS_GET_CUSTOMER_URL == "" || QUICKBOOKS_GET_PRODUCT_URL == "" || QUICKBOOKS_CREATE_ESTIMATE_URL == "" || QUICKBOOKS_DELETE_ESTIMATE_URL == "" {
 			log.Fatalf("Error initializing QuickBooks credentials: missing required environment variables")
 		}
 		log.Println("QuickBooks credentials initialized for PRODUCTION environment.")
