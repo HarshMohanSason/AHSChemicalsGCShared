@@ -20,4 +20,5 @@ const (
 	QuickbooksWebHookEntityProcessor         = "quickbooks-webhook-entity-processor" //Cloud event
 	SyncProductPricesPerCustomer             = "sync-products-prices-per-customer"
 	QuickbooksRefreshTokenExpirationReminder = "quickbooks-refresh-token-expiration-reminder"
+	DeleteCancelledOrders                    = "delete-cancelled-orders"
 )
