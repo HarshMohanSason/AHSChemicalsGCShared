@@ -184,6 +184,7 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 			TextColor:   canvas.White,
 			FillColor:   canvas.PrimaryGreen,
 			BorderColor: canvas.PrimaryGreen,
+			BorderThickness: 0.8,
 		},
 		Body: &canvas.TableBody{
 			X:           c.X,
@@ -192,8 +193,9 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 			Rows:        i.TableValues,
 			TextColor:   canvas.Black,
 			BorderColor: canvas.PrimaryGreen,
+			BorderThickness: 0.8,
 		},
-		Width: pdfutils.CalculateShippingTableCellWidths(shippingTableCellWidths),
+		Width: pdfutils.CalculateTableCellWidths(shippingTableCellWidths),
 	}).Draw(c, &canvas.Text{
 		Font:  "Helvetica",
 		Size:  10,
@@ -209,6 +211,8 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 	c.DrawBillingDetails([]string{"SUBTOTAL", fmt.Sprintf("TAX (%s)", i.TaxRate), "TOTAL"}, []string{i.SubTotal, i.TaxAmount, i.Total}, false, false)
 	c.MoveTo(c.MarginLeft, c.Y+5)
 
+	//Check if we need to add a new page (3 labels with a gap of 10px each, so 30px total)
+	c.AddNewPageIfEnd(25, canvas.PrimaryGreen, 0.8)
 	c.DrawSingleLineText(&canvas.Text{
 		Content: "Notes",
 		Font:    "Helvetica",
@@ -219,6 +223,9 @@ func (i *Invoice) RenderToPDF() ([]byte, error) {
 		Style:   "B",
 	})
 	c.IncY(5)
+
+	//Check if we need to add a new page (3 labels with a gap of 10px each, so 30px total)
+	c.AddNewPageIfEnd(25, canvas.PrimaryGreen, 0.8)
 	c.DrawMultipleLines(&canvas.Text{
 		Content: fmt.Sprintf("A late fee of %s will be charged if the invoice is not paid within the late fee date. Continued non-payment may result in suspension of services and additional collection actions.", i.LateFee),
 		Font:    "Helvetica",
