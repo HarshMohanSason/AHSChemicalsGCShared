@@ -20,26 +20,35 @@ func (t *Text) SetSize(size float64)      { t.Size = size }
 func (t *Text) SetContent(content string) { t.Content = content }
 func (t *Text) SetX(x float64)            { t.X = x }
 func (t *Text) SetY(y float64)            { t.Y = y }
-func (t *Text) SetColor(color [3]int)      { t.Color[0] = color[0]; t.Color[1] = color[1]; t.Color[2] = color[2] }
+func (t *Text) SetColor(color [3]int) {
+	t.Color[0] = color[0]
+	t.Color[1] = color[1]
+	t.Color[2] = color[2]
+}
 
 func (t *Text) ApplyTextStyle(pdf *gofpdf.Fpdf) {
 	pdf.SetFont(t.Font, t.Style, t.Size)
 	pdf.SetTextColor(t.Color[0], t.Color[1], t.Color[2])
 }
 
-//Only used for single line text
+// Only used for single line text
 func (t *Text) GetTextHeight(pdf *gofpdf.Fpdf) float64 {
 	t.ApplyTextStyle(pdf)
 	_, unitSize := pdf.GetFontSize()
 	return unitSize
 }
 
-func (t *Text) GetDescent(pdf *gofpdf.Fpdf) float64{
+func (t *Text) GetWidth(pdf *gofpdf.Fpdf) float64 {
+	t.ApplyTextStyle(pdf)
+	return pdf.GetStringWidth(t.Content)
+}
+
+func (t *Text) GetDescent(pdf *gofpdf.Fpdf) float64 {
 	t.ApplyTextStyle(pdf)
 	return float64(pdf.GetFontDesc(t.Font, t.Style).Descent)
 }
 
-func (t *Text) GetAscent(pdf *gofpdf.Fpdf) float64{
+func (t *Text) GetAscent(pdf *gofpdf.Fpdf) float64 {
 	t.ApplyTextStyle(pdf)
 	return float64(pdf.GetFontDesc(t.Font, t.Style).Ascent)
 }
@@ -58,7 +67,11 @@ func (c *Canvas) DrawSingleLineText(text *Text) {
 	c.PDF.Text(text.X, text.Y, text.Content)
 }
 
-func (c *Canvas) DrawMultipleLines(t *Text, allowedWidth float64, align string){
+// Draws multiple lines of text using the same font, style and size.
+// Does not support checking new page after each line because this function is used
+// to draw multiple lines of text in a single row. The caller is responsible for
+// checking new page when creating the row by first checking the row height.
+func (c *Canvas) DrawMultipleLines(t *Text, allowedWidth float64, align string) {
 	t.ApplyTextStyle(c.PDF)
 	lineHeight := t.GetTextHeight(c.PDF)
 	lines := c.PDF.SplitLines([]byte(t.Content), allowedWidth)
