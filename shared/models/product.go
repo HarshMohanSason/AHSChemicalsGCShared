@@ -200,6 +200,10 @@ func (p *Product) GetFormattedDescription() string {
 	return fmt.Sprintf("%s - %s %.2f %s (Pack of %d)", p.Brand, p.Name, p.Size, strings.ToLower(p.SizeUnit), p.PackOf)
 }
 
+func (p *Product) GetShortDescription() string {
+	return fmt.Sprintf("%s %s %.2f%s - %s", p.Brand, p.Name, p.Size, strings.ToLower(p.SizeUnit), p.SKU)
+}
+
 func (p *Product) GetFormattedUnitPrice() string {
 	return fmt.Sprintf("$%.2f", p.Price)
 }
